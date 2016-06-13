@@ -1,27 +1,20 @@
-if { [namespace exists ::Debug] } {
-  return
-}
+if { [namespace exists Debug] } return
+source [file join [file dirname [info script]] ProcAccess.tcl]
 
-namespace eval ::Debug {
-  variable verbose_ 0
 
-  namespace export verboseDo
-  proc verboseDo { script } {
+#============================================================================
+#============================================================================
+#============================================================================
+
+namespace eval Debug {
+  variable verbose_       0
+
+  public proc setVerbose { {onOff 1} } {
     variable verbose_
-    if { $verbose_ } {
-      uplevel $script
-    }
+    set verbose_ $onOff
   }
 
-  namespace export vputs
-  proc vputs { msg } {
-    verboseDo {
-      puts $msg
-    }
-  }
-
-  namespace export dumpDict
-  proc dumpDict { title dict {indent 0} } {
+  public proc dumpDict { title dict {indent 0} } {
     lassign [split "$title|Key|Value" |] title lbl1 lbl2
     set maxKeyWd [string length $lbl1]
     set maxValWd [string length $lbl2]
@@ -45,5 +38,22 @@ namespace eval ::Debug {
     puts "${pfx}\}"
   }
 
+  private proc verboseDo__ { body } {
+    variable verbose_
+    if { $verbose_ } {
+      uplevel $body
+    }
+  }
+
+  private proc vputs__ { args } {
+    verboseDo {
+      puts {*}$args
+    }
+  }
+
   namespace ensemble create
 }
+
+# alias the global keywords to the appropriate namespaced proc
+interp alias {} vputs      {} ::Debug::vputs__
+interp alias {} verboseDo  {} ::Debug::verboseDo__
