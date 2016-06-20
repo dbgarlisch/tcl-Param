@@ -64,7 +64,7 @@ namespace eval string {
   }
 
   proc registerAliases { } {
-    puts "### [namespace current]::registerAliases"
+    #vputs "### [namespace current]::registerAliases"
     ::Param typedef string text
   }
 }

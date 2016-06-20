@@ -84,7 +84,7 @@ namespace eval double {
   }
 
   proc registerAliases { } {
-    puts "### [namespace current]::registerAliases"
+    #vputs "### [namespace current]::registerAliases"
     ::Param typedef double real
     ::Param typedef double float
   }

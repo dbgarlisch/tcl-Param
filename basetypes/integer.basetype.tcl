@@ -61,7 +61,7 @@ namespace eval integer {
   }
 
   proc registerAliases { } {
-    puts "### [namespace current]::registerAliases"
+    #vputs "### [namespace current]::registerAliases"
     ::Param typedef integer int
   }
 }

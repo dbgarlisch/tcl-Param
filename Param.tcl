@@ -1,7 +1,8 @@
-if { [namespace exists ::Param] } {
-  return
-}
-source [file join [file dirname [info script]] Debug.tcl]
+if { [namespace exists ::Param] } return
+
+source [file join [file dirname [info script]] .. tcl-Utils Debug.tcl]
+source [file join [file dirname [info script]] .. tcl-Utils ProcAccess.tcl]
+
 
 # optionlist ?valspec ?valspec?... ?default defval? ?usage text? ?
 #
@@ -45,8 +46,7 @@ namespace eval ::Param {
 
   namespace import ::Debug::vputs ::Debug::verboseDo ::Debug::dumpDict
 
-  namespace export basetype
-  proc basetype { name {vtorNamespace {}} {replace 0} } {
+  public proc basetype { name {vtorNamespace {}} {replace 0} } {
     if { [isBasetype $name] && !$replace} {
       return -code error "Duplicate basetype name '$name'"
     }
@@ -67,8 +67,7 @@ namespace eval ::Param {
     }
   }
 
-  namespace export typedef
-  proc typedef { basetype name {range {}} {replace 0} } {
+  public proc typedef { basetype name {range {}} {replace 0} } {
     if { ![isBasetype $basetype] } {
       return -code error "Invalid typedef basetype '$name'"
     }
@@ -86,8 +85,7 @@ namespace eval ::Param {
     dict set typedefs_ $name Range $range
   }
 
-  namespace export new
-  proc new { type {val @@NULL@@} } {
+  public proc new { type {val @@NULL@@} } {
     variable basetypes_
     variable typedefs_
     if { ![isTypedef $type] } {
@@ -104,20 +102,17 @@ namespace eval ::Param {
     return $ret
   }
 
-  namespace export isBasetype
-  proc isBasetype { name } {
+  public proc isBasetype { name } {
     variable basetypes_
     return [dict exists $basetypes_ $name]
   }
 
-  namespace export getBasetype
-  proc getBasetype { typedefName } {
+  public proc getBasetype { typedefName } {
     variable typedefs_
     return [dict get $typedefs_ $typedefName BaseType]
   }
 
-  namespace export getValidator
-  proc getValidator { type } {
+  public proc getValidator { type } {
     if { [isTypedef $type] } {
       set type [getBasetype $type]
     }
@@ -125,8 +120,7 @@ namespace eval ::Param {
     return [dict get $basetypes_ $type]
   }
 
-  namespace export getLimits
-  proc getLimits { type } {
+  public proc getLimits { type } {
     if { ![isTypedef $type] } {
       return -code error "Unknown Param type '$type' must be one of [dict keys $typedefs_]"
     }
@@ -134,8 +128,7 @@ namespace eval ::Param {
     return [dict get $typedefs_ $type Limits]
   }
 
-  namespace export getRange
-  proc getRange { type } {
+  public proc getRange { type } {
     if { ![isTypedef $type] } {
       return -code error "Unknown Param type '$type' must be one of [dict keys $typedefs_]"
     }
@@ -143,8 +136,7 @@ namespace eval ::Param {
     return [dict get $typedefs_ $type Range]
   }
 
-  namespace export isTypedef
-  proc isTypedef { name } {
+  public proc isTypedef { name } {
     variable typedefs_
     return [dict exists $typedefs_ $name]
   }
@@ -155,7 +147,7 @@ namespace eval ::Param {
 
   # ================================= PRIVATE =================================
 
-  proc init {} {
+  private proc init {} {
     #basetype enum
     #basetype boolean
     set scriptDir [file dirname [info script]]
@@ -172,7 +164,7 @@ namespace eval ::Param {
     }
   }
 
-  proc dump { title } {
+  private proc dump { title } {
     variable basetypes_
     variable typedefs_
     puts {}
@@ -187,8 +179,7 @@ namespace eval ::Param {
     variable type_ {}
     variable val_ {}
 
-    namespace export =
-    proc = { val } {
+    public proc = { val } {
       variable type_
       if { [[::Param getValidator $type_]::validate $val [::Param getLimits $type_]] } {
         variable val_
@@ -198,37 +189,31 @@ namespace eval ::Param {
       }
     }
 
-    namespace export setValue
-    proc setValue { val } {
+    public proc setValue { val } {
       = $val
     }
 
-    namespace export getValue
-    proc getValue { } {
+    public proc getValue { } {
       variable val_
       return $val_
     }
 
-    namespace export getType
-    proc getType { } {
+    public proc getType { } {
       variable type_
       return $type_
     }
 
-    namespace export getLimits
-    proc getLimits { } {
+    public proc getLimits { } {
       variable type_
       return [::Param getLimits $type_]
     }
 
-    namespace export getRange
-    proc getRange { } {
+    public proc getRange { } {
       variable type_
       return [::Param getRange $type_]
     }
 
-    namespace export dump
-    proc dump {} {
+    public proc dump {} {
       variable self_
       variable type_
       variable val_
