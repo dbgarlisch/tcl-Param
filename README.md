@@ -36,9 +36,9 @@ Declare and initialize the application's data values.
 
 ## Base Data Types
 
-The Param library supports the `double`, `integer`, and `string` base data
-types. Base types are used to define application specific types using the
-`typedef` command. A corresponding typedef is created for each basetype. Base
+The Param library supports the `double`, `integer`, `string`, and `enum` base data
+types. Base types are used to define application specific types using the `typedef`
+command. If appropriate, a corresponding typedef is created for each basetype. Base
 typedefs do not have a range and support all valid, type-specific values.
 
 Several base type aliases are also defined.
@@ -117,6 +117,32 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | ------------------ | ----------------------------------- |
 | {r/^big.*$/it 4 7} | regexp, nocase, trim, length 4 to 7 |
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
+
+### Typedef enum range
+
+Range: `?|<CHAR>?token?=integer? ?|token?=integer??...`
+
+An `enum` value supports a fixed list of token values. Each token has an
+asociated integer id. The valid tokens are defined by a delimited list of
+`token=integer` pairs. If an integer id is not provided, it will be
+assigned the previous token's id value plus one. If there is no previous
+token, the id is set to zero.
+
+The default delimiter is the vbar '|' character. The delimiter can be changed
+by prefixing the list with a 2-character `|<CHAR>` sequence where `CHAR` is
+the new delimiter.
+
+Because all enum typedefs must have a non-empty range, an `enum` typedef is
+**not** created.
+
+All `enum` parameters support the `$param getId` command. This returns the
+integer id associated with the currently assigned enum token.
+
+| Range                       | Same as                           |
+| --------------------------- | --------------------------------- |
+| {red\|green\|blue\|alpha}   | {red=0\|green=1\|blue=2\|alpha=3} |
+| {red\|green\|blue\|alpha}   | {\|,red,green,blue,alpha}         |
+| {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
 
 ## Custom Base Types
 
