@@ -65,6 +65,6 @@ namespace eval string {
 
   proc registerAliases { } {
     #vputs "### [namespace current]::registerAliases"
-    ::Param typedef string text
+    ::Param basetype text [namespace current]
   }
 }

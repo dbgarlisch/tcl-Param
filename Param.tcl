@@ -61,9 +61,12 @@ namespace eval ::Param {
     dict set basetypes_ $name $vtorNamespace
     # create no-range typedef with same name as basetype
     typedef $name $name
-    # let basetype create alias typedefs
     if { "" != "[info procs ${vtorNamespace}::registerAliases]" } {
-      ${vtorNamespace}::registerAliases
+      # rename so proc cannot be called again if vtorNamespace is used by a
+      # basetype alias!
+      rename ${vtorNamespace}::registerAliases ${vtorNamespace}::registerAliasesImpl
+      # let basetype create aliases
+      ${vtorNamespace}::registerAliasesImpl
     }
   }
 
@@ -112,6 +115,11 @@ namespace eval ::Param {
     return [dict get $typedefs_ $typedefName BaseType]
   }
 
+  public proc getBasetypes { } {
+    variable basetypes_
+    return [dict keys $basetypes_]
+  }
+
   public proc getValidator { type } {
     if { [isTypedef $type] } {
       set type [getBasetype $type]
@@ -134,6 +142,13 @@ namespace eval ::Param {
     }
     variable typedefs_
     return [dict get $typedefs_ $type Range]
+  }
+
+  public proc getRangeSignature { type } {
+    if { ![isTypedef $type] } {
+      return -code error "Unknown Param type '$type' must be one of [dict keys $typedefs_]"
+    }
+    return [set [getValidator $type]::rangeSignature_]
   }
 
   public proc isTypedef { name } {
@@ -231,6 +246,8 @@ Param::init
 proc ::Param::unitTest {} {
   Param typedef integer iMonth {1 12}
   Param typedef double Scale {>0 10}
+  Param typedef real ScaleReal {>1 10}
+  Param typedef float ScaleFloat {>2 10}
   Param typedef string BigStrR {r/^big\S{1,4}$/it 4 7}
   Param typedef string BigStrG {g/big*/it 4 7}
   #Param typedef enum ColorComponent {red|green|blue|alpha}
@@ -247,6 +264,12 @@ proc ::Param::unitTest {} {
   set pod [Param new double 33.33]
   $pod dump
   $pod = 77.77
+  $pod dump
+
+  puts {}
+  set pod [Param new real 44.55]
+  $pod dump
+  $pod = 66.88
   $pod dump
 
   puts {}
@@ -270,6 +293,22 @@ proc ::Param::unitTest {} {
   $scale dump
 
   puts {}
+  set scale [Param new ScaleReal 1.1]
+  $scale dump
+  $scale setValue 1.4
+  $scale dump
+  $scale = 10.0000
+  $scale dump
+
+  puts {}
+  set scale [Param new ScaleFloat 2.1]
+  $scale dump
+  $scale setValue 2.4
+  $scale dump
+  $scale = 10.0000
+  $scale dump
+
+  puts {}
   set bigStr [Param new BigStrR "BigStr"]
   $bigStr dump
   $bigStr setValue "Big1234"
@@ -286,5 +325,13 @@ proc ::Param::unitTest {} {
   $bigStr dump
   $bigStr setValue "Big123"
   $bigStr dump
+
+  set fmt "| %-15.15s | %-60.60s |"
+  set dashes [string repeat - 100]
+  puts [format $fmt "Basetype" "Range Signature"]
+  puts [format $fmt $dashes $dashes]
+  foreach basetype [Param getBasetypes] {
+    puts [format $fmt $basetype [Param getRangeSignature $basetype]]
+  }
 }
 ::Param::unitTest

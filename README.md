@@ -33,3 +33,25 @@ Declare and initialize the application's data values.
   $scale = 10.5
   $scale = 10.50001 ;# error - out of range
 ```
+
+## Base Data Types
+
+The Param library supports the `double`, `integer`, and `string` base data
+types. Base types are used to define aplication specific types using the
+`typedef` command. A corresponding typedef is created for each basetype. Base
+typedefs do not have a range and support all valid, type-specific values.
+
+Several base type aliases are also defined. The `real` and `float` base types
+are aliases for `double`, `int` is an alias for `integer`, and `text` is an
+alias for `string`.
+
+## Typedef Data Types
+
+An application can declare its own types using the `typedef` command. A typedef
+has its own type name and an optional, type-specific value range.
+
+### Typedef double range
+
+### Typedef integer range
+
+### Typedef string range
