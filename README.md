@@ -98,13 +98,17 @@ unlimited value. If the range is empty, `{Inf Inf}` is used.
 Range: `?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???`
 
 A `string` value supports a `pattern` match and `minLen`, `maxLen` range.
+
 The `g` prefix specifies a Tcl *glob* comparison.
 The `r` prefix specifies a Tcl *regexp* comparison.
+
 The `pattern` is delimted by a matching `<CHAR>` pair. It can be any character
 not used in `pattern`.
+
 The `i` suffix specifies a case-insensitive comparison.
 The `t` suffix specifies the value should have leading and trailing whitespace
 trimmed before the comparison is performed.
+
 If `minLen` is specified, the value length must be >= `minLen`.
 If `maxLen` is specified, the value length must be <= `maxLen`.
 
