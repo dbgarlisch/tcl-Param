@@ -177,9 +177,12 @@ A validator implements the following variable and procs.
 
 ```tcl
 namespace eval NSPACE {
-  variable rangeSignature_ {signature-pattern} ;# REQUIRED
-  proc parseRange { range }                    ;# REQUIRED
-  proc validate { value limits }               ;# REQUIRED
-  proc registerAliases { }                     ;# OPTIONAL
+  variable rangeSignature_ {signature-pattern}                          ;# REQUIRED
+  variable createTypedef_ 1                                             ;# OPTIONAL
+  variable objectProto_ {commands added to objects of basetype}         ;# OPTIONAL
+  variable staticProto_ {static commands added to typedefs of basetype} ;# OPTIONAL
+  proc parseRange { range }                                             ;# REQUIRED
+  proc validate { value limits }                                        ;# REQUIRED
+  proc registerAliases { }                                              ;# OPTIONAL
 }
 ```
