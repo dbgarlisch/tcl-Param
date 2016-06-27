@@ -57,7 +57,7 @@ a parameter value, this range will be enforced. A Tcl `error` is triggered if
 the assigned value violates the range.
 
 ```tcl
-Param typedef { basetype name {range {}} {replace 0} }
+Param typedef basetype name {range {}} {replace 0}
 ```
 
 ### Typedef double range
@@ -117,3 +117,43 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | ------------------ | ----------------------------------- |
 | {r/^big.*$/it 4 7} | regexp, nocase, trim, length 4 to 7 |
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
+
+## Custom Base Types
+
+You can add custom base types to the Param library. A base type uses a validator
+to implement the base type's behavior. The Param library auto loads all base type
+definition files found in the `basetypes` subdirectory that are named
+`NAME?-VTOR?.basetype.tcl`. Where `NAME` is the base type's name and `VTOR` is the
+validator name used for this base type. If not provided, `VTOR` defaults to `NAME`.
+For example:
+
+* *real.basetype.tcl* defines
+  * A base type named *real*
+  * Using a validator named *real*
+* *real-vtor.basetype.tcl* defines
+  * A base type named *real*
+  * Using a validator named *vtor*
+
+If you do not want to autoload an application defined base type, you can load it
+explicitly using the `Param basetype` command.
+
+```tcl
+Param basetype name {vtorNamespace {}} {replace 0}
+```
+
+### Validator Namespace
+
+A validator is a Tcl namespace that provides one or more procs and variables used by the
+Param library. The validator namespace must be unique and must exist before the call
+to `Param basetype`.
+
+A validator implements the following variable and procs.
+
+```tcl
+namespace eval NSPACE {
+  variable rangeSignature_ {signature-pattern} ;# REQUIRED
+  proc parseRange { range }                    ;# REQUIRED
+  proc validate { value limits }               ;# REQUIRED
+  proc registerAliases { }                     ;# OPTIONAL
+}
+```
