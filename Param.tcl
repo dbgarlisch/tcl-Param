@@ -59,8 +59,16 @@ namespace eval ::Param {
     }
     variable basetypes_
     dict set basetypes_ $name $vtorNamespace
-    # create no-range typedef with same name as basetype
-    typedef $name $name
+
+    set doTypedef 1
+    if { "" != "[info vars ${vtorNamespace}::createTypedef_]" } {
+      set doTypedef [set ${vtorNamespace}::createTypedef_]
+    }
+    if { $doTypedef } {
+      # create no-range typedef with same name as basetype
+      typedef $name $name
+    }
+
     if { "" != "[info procs ${vtorNamespace}::registerAliases]" } {
       # rename so proc cannot be called again if vtorNamespace is used by a
       # basetype alias!
@@ -86,6 +94,20 @@ namespace eval ::Param {
     dict set typedefs_ $name BaseType $basetype
     dict set typedefs_ $name Limits [${vtorNamespace}::parseRange $range]
     dict set typedefs_ $name Range $range
+
+    if { "" == "[info vars ${vtorNamespace}::staticProto_]" } {
+      # do nothing
+    } elseif { [namespace exists ::$name] } {
+      return -code error "Typedef namespace collision '$name'"
+    } else {
+      #vputs "${vtorNamespace}::staticProto_ =\n[set ${vtorNamespace}::staticProto_]"
+      namespace eval ::$name [set ${vtorNamespace}::staticProto_]
+      namespace eval ::$name {
+        variable self_ {}
+        namespace ensemble create
+      }
+      set ::${name}::self_ $name
+    }
   }
 
   public proc new { type {val @@NULL@@} } {
@@ -101,6 +123,19 @@ namespace eval ::Param {
     namespace eval $ret $paramProto_
     set ${ret}::self_ $ret
     set ${ret}::type_ $type
+
+    set vtorNamespace [getValidator $type]
+    if { "" != "[info vars ${vtorNamespace}::objectProto_]" } {
+      #vputs "${vtorNamespace}::objectProto_ =\n[set ${vtorNamespace}::objectProto_]"
+      namespace eval $ret [set ${vtorNamespace}::objectProto_]
+    }
+
+    # now we can create the ensemble
+    namespace eval $ret {
+      namespace ensemble create
+    }
+
+    # assign ctor value
     $ret = [expr {"$val" == "@@NULL@@" ? "DEF" : "$val"}]
     return $ret
   }
@@ -145,9 +180,6 @@ namespace eval ::Param {
   }
 
   public proc getRangeSignature { type } {
-    if { ![isTypedef $type] } {
-      return -code error "Unknown Param type '$type' must be one of [dict keys $typedefs_]"
-    }
     return [set [getValidator $type]::rangeSignature_]
   }
 
@@ -168,11 +200,21 @@ namespace eval ::Param {
     set scriptDir [file dirname [info script]]
     set basetypesDir [file join $scriptDir basetypes]
     foreach basetypeFile [glob -directory $basetypesDir -type f *.basetype.tcl] {
-      namespace eval VTOR [list source "$basetypeFile"]
-      # capture name from "/some/path/to/name.basetype.tcl"
+      # Capture "name?-namespace?" from "/path/to/name?-namespace?.basetype.tcl"
       lassign [split [file tail $basetypeFile] "."] name
+      # Capture "name" and "namespace" from "name?-namespace?"
+      lassign [split $name "-"] name nspace
+      if { "" != "$nspace" } {
+        # Make validator namespace a child of the ::Param::VTOR namespace
+        set nspace "::Param::VTOR::$nspace"
+      }
+      if { [namespace exists $nspace] } {
+        return -code error "Duplicate validator '$nspace' in '$basetypeFile'."
+      }
+      # load validator
+      namespace eval VTOR [list source "$basetypeFile"]
       # register new basetype with ::Param
-      basetype $name
+      basetype $name $nspace
     }
     verboseDo {
       Param::dump "[namespace current]::init"
@@ -250,7 +292,6 @@ proc ::Param::unitTest {} {
   Param typedef float ScaleFloat {>2 10}
   Param typedef string BigStrR {r/^big\S{1,4}$/it 4 7}
   Param typedef string BigStrG {g/big*/it 4 7}
-  #Param typedef enum ColorComponent {red|green|blue|alpha}
   #Param typedef boolean Switched {on=1|off=0}
   Param::dump "::Param::unitTest"
 

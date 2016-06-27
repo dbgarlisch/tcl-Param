@@ -3,7 +3,7 @@ if { [namespace exists string] } {
 }
 
 namespace eval string {
-  variable rangeSignature_ {?g|r<CHAR>pattern<CHAR> ?minLen ?maxLen???}
+  variable rangeSignature_ {?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???}
 
   #namespace import ::Debug::vputs
 
