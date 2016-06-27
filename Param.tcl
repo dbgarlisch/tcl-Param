@@ -276,8 +276,6 @@ namespace eval ::Param {
       variable val_
       puts "${self_}: type($type_) value($val_)"
     }
-
-    namespace ensemble create
   }
 
   namespace ensemble create
@@ -292,6 +290,9 @@ proc ::Param::unitTest {} {
   Param typedef float ScaleFloat {>2 10}
   Param typedef string BigStrR {r/^big\S{1,4}$/it 4 7}
   Param typedef string BigStrG {g/big*/it 4 7}
+  #namespace eval ::ColorComponent {}
+  #namespace delete ::ColorComponent
+  Param typedef enum ColorComponent {red|green|blue=5|alpha}
   #Param typedef boolean Switched {on=1|off=0}
   Param::dump "::Param::unitTest"
 
@@ -367,8 +368,21 @@ proc ::Param::unitTest {} {
   $bigStr setValue "Big123"
   $bigStr dump
 
+  puts {}
+  set ccomp [Param new ColorComponent "red"]
+  $ccomp dump
+  puts "$ccomp id([$ccomp getId])"
+  $ccomp setValue "green"
+  $ccomp dump
+  puts "$ccomp id([$ccomp getId])"
+  $ccomp = "blue"
+  $ccomp dump
+  puts "$ccomp id([$ccomp getId])"
+  puts "ColorComponent getTokenId(alpha=[ColorComponent getTokenId alpha])"
+
   set fmt "| %-15.15s | %-60.60s |"
   set dashes [string repeat - 100]
+  puts {}
   puts [format $fmt "Basetype" "Range Signature"]
   puts [format $fmt $dashes $dashes]
   foreach basetype [Param getBasetypes] {
