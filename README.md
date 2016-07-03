@@ -34,6 +34,17 @@ Declare and initialize the application's data values.
   $scale = 10.50001 ;# error - out of range
 ```
 
+## Typedef Data Types
+
+An application can declare its own types using the `typedef` command. A typedef
+has its own type name and an optional, type-specific value range. When assigning
+a parameter value, this range will be enforced. A Tcl `error` is triggered if
+the assigned value violates the range.
+
+```tcl
+Param typedef basetype name {range {}} {replace 0}
+```
+
 ## Base Data Types
 
 The Param library supports the `double`, `integer`, `string`, and `enum` base data
@@ -49,18 +60,9 @@ Several base type aliases are also defined.
 | `integer` | `int`           |
 | `string`  | `text`          |
 
-## Typedef Data Types
+### Ranges
 
-An application can declare its own types using the `typedef` command. A typedef
-has its own type name and an optional, type-specific value range. When assigning
-a parameter value, this range will be enforced. A Tcl `error` is triggered if
-the assigned value violates the range.
-
-```tcl
-Param typedef basetype name {range {}} {replace 0}
-```
-
-### Typedef double range
+#### double
 
 Range: `?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??`
 
@@ -79,7 +81,7 @@ empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0.0 <= value <= Inf  |
 | {}        | Inf <= value <= Inf  |
 
-### Typedef integer range
+#### integer
 
 Range: `?Inf|minLimit ?Inf|maxLimit??`
 
@@ -93,7 +95,7 @@ unlimited value. If the range is empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0 <= value <= Inf    |
 | {}        | Inf <= value <= Inf  |
 
-### Typedef string range
+#### string
 
 Range: `?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???`
 
@@ -118,7 +120,7 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | {r/^big.*$/it 4 7} | regexp, nocase, trim, length 4 to 7 |
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
 
-### Typedef enum range
+#### enum
 
 Range: `?|<CHAR>?token?=integer? ?|token?=integer??...`
 
@@ -144,7 +146,7 @@ integer id associated with the currently assigned enum token.
 | {red\|green\|blue\|alpha}   | {\|,red,green,blue,alpha}         |
 | {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
 
-## Custom Base Types
+### Custom Base Types
 
 You can add custom base types to the Param library. A base type uses a validator
 to implement the base type's behavior. The Param library auto loads all base type
@@ -167,7 +169,7 @@ explicitly using the `Param basetype` command.
 Param basetype name {vtorNamespace {}} {replace 0}
 ```
 
-### Validator Namespace
+#### Validator Namespace
 
 A validator is a Tcl namespace that provides one or more procs and variables used by the
 Param library. The validator namespace must be unique and must exist before the call
