@@ -81,6 +81,12 @@ where,
 
 `type` - Is a type definition or base type name.
 
+### getTypedefs
+Returns a list of all type definition names.
+```tcl
+Param getTypedefs
+```
+
 ### getValidator
 Returns the validator namespace name for a given type.
 ```tcl
