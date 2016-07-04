@@ -39,44 +39,6 @@ where,
 
 `replace` - If 1, any existing base type definition will be replaced with this one. (default 0)
 
-### typedef
-Creates an application defined parameter data type. A typedef has its own type name and an optional,
-basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
-`error` is triggered if the assigned value violates the range. The `basetype` must be one of the
-[built-in](#base-data-types) or [user defined](#custom-base-types) base types. Returns nothing.
-```tcl
-Param typedef basetype name ?range? ?replace?
-```
-where,
-
-`basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
-
-`name` - The name of the type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
-
-`range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
-
-`replace` - If 1, any existing type definition will be replaced with this one. (default 0)
-
-### new
-Creates a parameter object. Returns the parameter object.
-```tcl
-Param new type ?val?
-```
-where,
-
-`type` - An existing type definition name.
-
-`val` - The optional, initial parameter value. The default is type dependent.
-
-### isBasetype
-Returns 1 if `name` is a valid base type name.
-```tcl
-Param isBasetype name
-```
-where,
-
-`name` - The name being tested.
-
 ### getBasetype
 Returns the base type of a type definition.
 ```tcl
@@ -91,15 +53,6 @@ Returns a list of all base type names.
 ```tcl
 Param getBasetypes
 ```
-
-### getValidator
-Returns the validator namespace name for a given type.
-```tcl
-Param getValidator type
-```
-where,
-
-`type` - Is a type definition or base type name.
 
 ### getLimits
 Returns the limits for a given type.
@@ -128,6 +81,24 @@ where,
 
 `type` - Is a type definition or base type name.
 
+### getValidator
+Returns the validator namespace name for a given type.
+```tcl
+Param getValidator type
+```
+where,
+
+`type` - Is a type definition or base type name.
+
+### isBasetype
+Returns 1 if `name` is a valid base type name.
+```tcl
+Param isBasetype name
+```
+where,
+
+`name` - The name being tested.
+
 ### isTypedef
 Returns 1 if `name` is a valid type definition name.
 ```tcl
@@ -136,6 +107,35 @@ Param isTypedef name
 where,
 
 `name` - The name being tested.
+
+### new
+Creates a parameter object. Returns the parameter object.
+```tcl
+Param new type ?val?
+```
+where,
+
+`type` - An existing type definition name.
+
+`val` - The optional, initial parameter value. The default is type dependent.
+
+### typedef
+Creates an application defined parameter data type. A typedef has its own type name and an optional,
+basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
+`error` is triggered if the assigned value violates the range. The `basetype` must be one of the
+[built-in](#base-data-types) or [user defined](#custom-base-types) base types. Returns nothing.
+```tcl
+Param typedef basetype name ?range? ?replace?
+```
+where,
+
+`basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
+
+`name` - The name of the type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
+
+`range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
+
+`replace` - If 1, any existing type definition will be replaced with this one. (default 0)
 
 
 ## Builtin Base Types
