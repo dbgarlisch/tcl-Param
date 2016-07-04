@@ -155,6 +155,11 @@ namespace eval ::Param {
     return [dict keys $basetypes_]
   }
 
+  public proc getTypedefs { } {
+    variable typedefs_
+    return [dict keys $typedefs_]
+  }
+
   public proc getValidator { type } {
     if { [isTypedef $type] } {
       set type [getBasetype $type]
