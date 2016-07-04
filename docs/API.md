@@ -21,21 +21,16 @@ Commands in this ensemble are accessed as:
 Param <cmd> <options>
 ```
 Where,
-<dl>
-  <dt><code>cmd</code></dt>
-  <dd>Is one of the Param command names.</dd>
-  <dt><code>options</code></dt>
-  <dd>The cmd dependent options.</dd>
-</dl>
-<br/>
+
+`cmd` - Is one of the Param command names listed below.
+
+`options` - The cmd dependent options.
 
 ### basetype
 Creates an application defined basetype. See [Custom Base Types](#custom-base-types).
-
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
 ```
-
 where,
 
 `name` - The name of the base type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
@@ -49,11 +44,9 @@ Creates an application defined parameter data type. A typedef has its own type n
 basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
 `error` is triggered if the assigned value violates the range. The `basetype` must be one of the
 [built-in](#base-data-types) or [user defined](#custom-base-types) base types.
-
 ```tcl
 Param typedef basetype name ?range? ?replace?
 ```
-
 where,
 
 `basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
@@ -63,6 +56,87 @@ where,
 `range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
+
+### public proc new { type {val @@NULL@@} } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc isBasetype { name } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc getBasetype { typedefName } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc getBasetypes { } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc getValidator { type } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc getLimits { type } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc getRange { type } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc getRangeSignature { type } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
+
+### public proc isTypedef { name } {
+blah blah blah.
+```tcl
+Param xxx xxx xxx
+```
+where,
+
+`xxxx` - blah blah.
 
 
 ## Builtin Base Types
