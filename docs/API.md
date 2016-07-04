@@ -44,17 +44,26 @@ where,
 
 `replace` - If 1, any existing base type definition will be replaced with this one. (default 0)
 
-
-## Typedef Data Types
-
-An application can declare its own types using the `typedef` command. A typedef
-has its own type name and an optional, basetype-specific value range. When assigning
-a parameter value, this range will be enforced. A Tcl `error` is triggered if
-the assigned value violates the range. The `basetype` must be one of the [built-in](#base-data-types) or [user defined](#custom-base-types) base types.
+### typedef
+Creates an application defined parameter data type. A typedef has its own type name and an optional,
+basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
+`error` is triggered if the assigned value violates the range. The `basetype` must be one of the
+[built-in](#base-data-types) or [user defined](#custom-base-types) base types.
 
 ```tcl
-Param typedef basetype name {range {}} {replace 0}
+Param typedef basetype name ?range? ?replace?
 ```
+
+where,
+
+`basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
+
+`name` - The name of the type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
+
+`range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
+
+`replace` - If 1, any existing type definition will be replaced with this one. (default 0)
+
 
 ## Builtin Base Types
 
