@@ -30,11 +30,13 @@ Where,
 <br/>
 
 ### basetype
+Creates an application defined basetype. See [Custom Base Types](#custom-base-types).
 
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
 ```
-Creates an application defined basetype.
+
+where,
 
 `name` - The name of the base type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
 
