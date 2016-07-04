@@ -4,7 +4,7 @@ Provides the *Param* command ensemble.
 
 ### Table of Contents
 * [Param Commands](#param-commands)
-* [Builtin Base Types](#builtin-data-types)
+* [Builtin Base Types](#builtin-base-types)
   * [double range](#double)
   * [integer range](#integer)
   * [string range](#string)
@@ -18,35 +18,29 @@ Provides the *Param* command ensemble.
 Commands in this ensemble are accessed as:
 
 ```Tcl
-pw::listutils <cmd> ?<options>?
+Param <cmd> <options>
 ```
 Where,
 <dl>
   <dt><code>cmd</code></dt>
-  <dd>Is one of the setwise operation names.</dd>
+  <dd>Is one of the Param command names.</dd>
   <dt><code>options</code></dt>
-  <dd>Optional, cmd dependent options.</dd>
+  <dd>The cmd dependent options.</dd>
 </dl>
 <br/>
 
-### lproduct
+### basetype
 
 ```Tcl
-pw::listutils lproduct <subcmd> ?<options>?
+Param basetype name ?vtorNamespace? ?replace?
 ```
-Computes the product for a collection of lists.
+Creates an application defined basetype.
 
-For example, the product of `{1 2 3}` and `{a b}` is
-`{{1 a} {1 b} {2 a} {2 b} {3 a} {3 b}}`
+`name` - The name of the base type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
 
-<dl>
-  <dt><code>subCmd</code></dt>
-  <dd>One of get or foreach.</dd>
-</dl>
-<br/>
+`vtorNamespace` - The optional validator namespace. See [Validators](#validators). (default `name`)
 
-
-# xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+`replace` - If 1, any existing base type definition will be replaced with this one. (default 0)
 
 
 ## Typedef Data Types
