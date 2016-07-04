@@ -34,12 +34,16 @@ Declare and initialize the application's data values.
   $scale = 10.50001 ;# error - out of range
 ```
 
+See the [tcl-Param API Docs][API] for full library documentation.
+
+[API]: docs/API.md
+
 ## Typedef Data Types
 
 An application can declare its own types using the `typedef` command. A typedef
-has its own type name and an optional, type-specific value range. When assigning
+has its own type name and an optional, basetype-specific value range. When assigning
 a parameter value, this range will be enforced. A Tcl `error` is triggered if
-the assigned value violates the range.
+the assigned value violates the range. The `basetype` must be one of the [built-in](#base-data-types) or [user defined](#custom-base-types) base types.
 
 ```tcl
 Param typedef basetype name {range {}} {replace 0}
@@ -148,7 +152,7 @@ integer id associated with the currently assigned enum token.
 
 ### Custom Base Types
 
-You can add custom base types to the Param library. A base type uses a validator
+You can add a custom, user defined base types to the Param library. A base type uses a validator
 to implement the base type's behavior. The Param library auto loads all base type
 definition files found in the `basetypes` subdirectory that are named
 `NAME?-VTOR?.basetype.tcl`. Where `NAME` is the base type's name and `VTOR` is the
