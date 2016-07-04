@@ -27,7 +27,7 @@ Where,
 `options` - The cmd dependent options.
 
 ### basetype
-Creates an application defined basetype. See [Custom Base Types](#custom-base-types).
+Creates an application defined basetype. Returns nothing See [Custom Base Types](#custom-base-types).
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
 ```
@@ -43,7 +43,7 @@ where,
 Creates an application defined parameter data type. A typedef has its own type name and an optional,
 basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
 `error` is triggered if the assigned value violates the range. The `basetype` must be one of the
-[built-in](#base-data-types) or [user defined](#custom-base-types) base types.
+[built-in](#base-data-types) or [user defined](#custom-base-types) base types. Returns nothing.
 ```tcl
 Param typedef basetype name ?range? ?replace?
 ```
@@ -57,86 +57,85 @@ where,
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
 
-### public proc new { type {val @@NULL@@} } {
-blah blah blah.
+### new
+Creates a parameter object. Returns the parameter object.
 ```tcl
-Param xxx xxx xxx
+Param new type ?val?
 ```
 where,
 
-`xxxx` - blah blah.
+`type` - An existing type definition name.
 
-### public proc isBasetype { name } {
-blah blah blah.
+`val` - The optional, initial parameter value. The default is type dependent.
+
+### isBasetype
+Returns 1 if `name` is a valid base type name.
 ```tcl
-Param xxx xxx xxx
+Param isBasetype name
 ```
 where,
 
-`xxxx` - blah blah.
+`name` - The name being tested.
 
-### public proc getBasetype { typedefName } {
-blah blah blah.
+### getBasetype
+Returns the base type of a type definition.
 ```tcl
-Param xxx xxx xxx
+Param getBasetype typedefName
 ```
 where,
 
-`xxxx` - blah blah.
+`typedefName` - The type definition name.
 
-### public proc getBasetypes { } {
-blah blah blah.
+### getBasetypes
+Returns a list of all base type names.
 ```tcl
-Param xxx xxx xxx
+Param getBasetypes
+```
+
+### getValidator
+Returns the validator namespace name for a given type.
+```tcl
+Param getValidator type
 ```
 where,
 
-`xxxx` - blah blah.
+`type` - Is a type definition or base type name.
 
-### public proc getValidator { type } {
-blah blah blah.
+### getLimits
+Returns the limits for a given type.
 ```tcl
-Param xxx xxx xxx
+Param getLimits type
 ```
 where,
 
-`xxxx` - blah blah.
+`type` - Is a type definition or base type name.
 
-### public proc getLimits { type } {
-blah blah blah.
+### getRange
+Returns the range for a given type.
 ```tcl
-Param xxx xxx xxx
+Param getRange type
 ```
 where,
 
-`xxxx` - blah blah.
+`type` - Is a type definition or base type name.
 
-### public proc getRange { type } {
-blah blah blah.
+### getRangeSignature
+Returns the human readable range signature for a given type.
 ```tcl
-Param xxx xxx xxx
+Param getRangeSignature type
 ```
 where,
 
-`xxxx` - blah blah.
+`type` - Is a type definition or base type name.
 
-### public proc getRangeSignature { type } {
-blah blah blah.
+### isTypedef
+Returns 1 if `name` is a valid type definition name.
 ```tcl
-Param xxx xxx xxx
+Param isTypedef name
 ```
 where,
 
-`xxxx` - blah blah.
-
-### public proc isTypedef { name } {
-blah blah blah.
-```tcl
-Param xxx xxx xxx
-```
-where,
-
-`xxxx` - blah blah.
+`name` - The name being tested.
 
 
 ## Builtin Base Types
