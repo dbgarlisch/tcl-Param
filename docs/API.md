@@ -17,6 +17,8 @@ Provides the *Param* command ensemble.
   * [new](#new)
   * [typedef](#typedef)
 * [Param Examples](#param-examples)
+  * [Base Type Params](#base-type-params)
+  * [Typedef Params](#typedef-params)
 * [Builtin Base Types](#builtin-base-types)
   * [double range](#double)
   * [integer range](#integer)
