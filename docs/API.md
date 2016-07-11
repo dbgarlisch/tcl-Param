@@ -285,10 +285,16 @@ See [Validators](#validators).
 ### Base Type Definition File
 
 The Param library auto loads all base type definition files found in the `basetypes`
-subdirectory. Theses files use the `NAME?-VTOR?.basetype.tcl` naming convention. Where
-`NAME` is the base type's name and `VTOR` is the validator name used for this base
-type. If not provided, `VTOR` defaults to `NAME`. A base type definition file contains
-the named validator's implementation.
+subdirectory. A base type definition file contains the named validator's implementation.
+Base type definition files require a naming convention.
+```
+NAME?-VTOR?.basetype.tcl
+```
+where,
+
+`NAME` - The base type's name.
+
+`VTOR` - The validator's name. If not provided, `VTOR` defaults to `NAME`.
 
 For example, a base type definition file named:
 * *real.basetype.tcl*
@@ -359,24 +365,25 @@ where,
 
 example,
 ```
-# for integer base type
-variable rangeSignature_ {?Inf|minLimit ?Inf|maxLimit??}
-
-proc parseRange { range } {
-  set re {^(Inf|[+-]?\d+)(?: +(Inf|[+-]?\d+))?$}
-  set range [string trim $range]
-  if { 0 == [llength $range] } {
-    set min Inf
-    set max Inf
-  } elseif { ![regexp -nocase $re $range -> min max] ||
-      ![parseLimit min] || ![parseLimit max] } {
-    variable rangeSignature_
-    return -code error "Invalid range: '$range'. Should be '$rangeSignature_'"
+namespace eval integer {
+  variable rangeSignature_ {?Inf|minLimit ?Inf|maxLimit??}
+  
+  proc parseRange { range } {
+    set re {^(Inf|[+-]?\d+)(?: +(Inf|[+-]?\d+))?$}
+    set range [string trim $range]
+    if { 0 == [llength $range] } {
+      set min Inf
+      set max Inf
+    } elseif { ![regexp -nocase $re $range -> min max] ||
+        ![parseLimit min] || ![parseLimit max] } {
+      variable rangeSignature_
+      return -code error "Invalid range: '$range'. Should be '$rangeSignature_'"
+    }
+    set ret [dict create]
+    setLimit ret MIN $min
+    setLimit ret MAX $max
+    return $ret
   }
-  set ret [dict create]
-  setLimit ret MIN $min
-  setLimit ret MAX $max
-  return $ret
 }
 ```
 
@@ -398,15 +405,16 @@ where,
 
 example,
 ```
-# for integer base type
-proc validate { value limits } {
-  set ret 1
-  if { [dict exists $limits MIN] && $value < [dict get $limits MIN]} {
-    set ret 0
-  } elseif { [dict exists $limits MAX] && $value > [dict get $limits MAX]} {
-    set ret 0
+namespace eval integer {
+  proc validate { value limits } {
+    set ret 1
+    if { [dict exists $limits MIN] && $value < [dict get $limits MIN]} {
+      set ret 0
+    } elseif { [dict exists $limits MAX] && $value > [dict get $limits MAX]} {
+      set ret 0
+    }
+    return $ret
   }
-  return $ret
 }
 ```
 
@@ -419,8 +427,9 @@ Creates one or more aliases for a base type. Invoked once by
 
 example,
 ```
-# aliases for the intger base type
-proc registerAliases { } {
-  ::Param basetype int [namespace current]
+namespace eval integer {
+  proc registerAliases { } {
+    ::Param basetype int [namespace current]
+  }
 }
 ```
