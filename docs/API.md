@@ -329,3 +329,20 @@ foreach basetype [Param getBasetypes] {
  puts [format $fmt $basetype [Param getRangeSignature $basetype]]
 }
 ```
+
+Output:
+```
+::Param::param_11 id(5)
+ColorComponent getTokenId(alpha=6)
+
+| Basetype        | Range Signature                                              |
+| --------------- | ------------------------------------------------------------ |
+| double          | ?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??                      |
+| real            | ?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??                      |
+| float           | ?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??                      |
+| enum            | ?|<CHAR>?token?=integer? ?|token?=integer??...               |
+| integer         | ?Inf|minLimit ?Inf|maxLimit??                                |
+| int             | ?Inf|minLimit ?Inf|maxLimit??                                |
+| string          | ?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???             |
+| text            | ?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???             |
+```
