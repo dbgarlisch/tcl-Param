@@ -22,6 +22,7 @@ Provides the *Param* command ensemble.
   * [string range](#string)
   * [enum range](#enum)
 * [Custom Base Types](#custom-base-types)
+  * [Base Type Definition File](#base-type-definition-file)
   * [Validators](#validators)
 
 
@@ -39,7 +40,7 @@ Where,
 `options` - The cmd dependent options.
 
 ### basetype
-Creates an application defined basetype. Returns nothing See [Custom Base Types](#custom-base-types).
+Creates an application defined basetype. Returns nothing. See [Custom Base Types](#custom-base-types).
 
 usage,
 ```Tcl
@@ -283,13 +284,19 @@ integer id associated with the currently assigned enum token.
 
 ## Custom Base Types
 
-Custom, user defined base types can be added to the Param library. A base type uses a validator
-to implement the base type's behavior. See [Validators](#validators) for details.
+New base types can be added to the Param library. A new base type can be
+explicitly added by an application using the [basetype](#basetype) command
+or automatically added by creating a base type definition file.
+
+Each base type uses a validator to implement its behavior.
+See [Validators](#validators) for details.
+
+### Base Type Definition File
 
 The Param library auto loads all base type definition files found in the `basetypes`
-subdirectory that are named `NAME?-VTOR?.basetype.tcl`. Where `NAME` is the base type's
-name and `VTOR` is the validator name used for this base type. If not provided, `VTOR`
-defaults to `NAME`. For example:
+subdirectory. Theses files use the `NAME?-VTOR?.basetype.tcl` naming convention. Where
+`NAME` is the base type's name and `VTOR` is the validator name used for this base
+type. If not provided, `VTOR` defaults to `NAME`. For example:
 
 * *real.basetype.tcl* defines
   * A base type named *real*
@@ -297,13 +304,6 @@ defaults to `NAME`. For example:
 * *real-vtor.basetype.tcl* defines
   * A base type named *real*
   * Using a validator named *vtor*
-
-If you do not want to autoload an application defined base type, you can load it
-explicitly using the `Param basetype` command.
-
-```tcl
-Param basetype name {vtorNamespace {}} {replace 0}
-```
 
 ### Validators
 
