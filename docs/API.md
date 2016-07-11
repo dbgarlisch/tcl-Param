@@ -17,13 +17,13 @@ Provides the *Param* command ensemble.
   * [new](#param-new)
   * [typedef](#param-typedef)
 * [Parameter Object Commands](#parameter-object-commands)
-  * [=](#-setvalue)
-  * [setValue](#setvalue)
-  * [getValue](#getvalue)
-  * [getType](#gettype)
-  * [getLimits](#getlimits)
-  * [getRange](#getrange)
-  * [dump](#dump)
+  * [=](#obj-)
+  * [setValue](#obj-setvalue)
+  * [getValue](#obj-getvalue)
+  * [getType](#obj-gettype)
+  * [getLimits](#obj-getlimits)
+  * [getRange](#obj-getrange)
+  * [dump](#obj-dump)
 * [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
@@ -162,33 +162,37 @@ basetype-specific value range. When assigning a parameter value, this range will
 
 where,
 
-`basetype` - One of the [built in](BuiltInBaseTypes.md) or [user defined](CustomBaseTypes.md) base types. See the [basetype](#param-basetype) command.
+`basetype` - One of the [built in](BuiltInBaseTypes.md) or [user defined](CustomBaseTypes.md)
+             base types. See the [basetype](#param-basetype) command.
 
-`name` - The name of the type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
+`name` - The name of the type being created. An error is triggered if `name` is not unique
+         unless `replace` is set to 1.
 
-`range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
+`range` - The optional, base type specific range. See ranges for the
+          [BuiltIn Base Types](BuiltInBaseTypes.md). (default {})
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
+
 
 ## Parameter Object Commands
 All parameter objects support the following commands. Additional commands may be added by a
 particular base type (see [VVTOR::objectProto_](CustomBaseTypes.md#validator-variables)).
 
-### = (setValue)
+### $obj =
 ```tcl
-$param = val
+$obj = val
 ```
 Assignes a new value to the parameter. An error is triggered if the value
-violates the parameter type range. Same as the [setValue](#setvalue) command.
+violates the parameter type range. Same as the [setValue](#obj-setvalue) command.
 Returns the assigned value.
 
 where,
 
 `val` - The value being assigned.
 
-### setValue
+### $obj setValue
 ```tcl
-$param setValue val
+$obj setValue val
 ```
 Assignes a new value to the parameter. An error is triggered if the value
 violates the associated range. Returns the assigned value.
@@ -197,35 +201,35 @@ where,
 
 `val` - The value being assigned.
 
-### getValue
+### $obj getValue
 ```tcl
-$param getValue
+$obj getValue
 ```
 Returns the current parameter value.
 
-### getType
+### $obj getType
 ```tcl
-$param getType
+$obj getType
 ```
-Returns the paramter type as passed to [Param new](#new).
+Returns the paramter type as passed to [Param new](#param-new).
 
-### getLimits
+### $obj getLimits
 ```tcl
-$param getLimits
+$obj getLimits
 ```
 Returns the parsed `range` value as returned by [VTOR::parseRange](CustomBaseTypes.md#parseRange).
 The exact structure of this value is base type dependent and is typically not
 used or needed by an application except for debugging.
 
-### getRange
+### $obj getRange
 ```tcl
-$param getRange
+$obj getRange
 ```
 Returns the unparsed `range` value passed to [Param typedef](#param-typedef).
 
-### dump
+### $obj dump
 ```tcl
-$param dump
+$obj dump
 ```
 Returns a text representation of the parameter as
 ```
