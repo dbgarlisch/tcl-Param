@@ -158,11 +158,11 @@ Param typedef basetype name ?range? ?replace?
 Creates an application defined parameter data type. A typedef has its own type name and an optional,
 basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
 `error` is triggered if the assigned value violates the range. The `basetype` must be one of the
-[built-in](#base-data-types) or [user defined](#custom-base-types) base types. Returns nothing.
+[built-in](BuiltInBaseTypes.md) or [user defined](CustomBaseTypes.md) base types. Returns nothing.
 
 where,
 
-`basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
+`basetype` - One of the [built in](BuiltInBaseTypes.md) or [user defined](CustomBaseTypes.md) base types. See the [basetype](#param-basetype) command.
 
 `name` - The name of the type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
 
@@ -172,7 +172,7 @@ where,
 
 ## Parameter Object Commands
 All parameter objects support the following commands. Additional commands may be added by a
-particular base type (see [VVTOR::objectProto_](#validator-variables)).
+particular base type (see [VVTOR::objectProto_](CustomBaseTypes.md#validator-variables)).
 
 ### = (setValue)
 ```tcl
@@ -213,7 +213,7 @@ Returns the paramter type as passed to [Param new](#new).
 ```tcl
 $param getLimits
 ```
-Returns the parsed `range` value as returned by [VTOR::parseRange](#parseRange).
+Returns the parsed `range` value as returned by [VTOR::parseRange](CustomBaseTypes.md#parseRange).
 The exact structure of this value is base type dependent and is typically not
 used or needed by an application except for debugging.
 
@@ -221,7 +221,7 @@ used or needed by an application except for debugging.
 ```tcl
 $param getRange
 ```
-Returns the unparsed `range` value passed to [Param typedef](#typedef).
+Returns the unparsed `range` value passed to [Param typedef](#param-typedef).
 
 ### dump
 ```tcl
@@ -235,7 +235,7 @@ Returns a text representation of the parameter as
 ## Usage Examples
 
 ### Base Type Params
-Base types that support typedefs (see [VTOR::createTypedef_](#validator-variables)) can be used
+Base types that support typedefs (see [VTOR::createTypedef_](CustomBaseTypes.md#validator-variables)) can be used
 for parameters. These parameters will have an unlimited range.
 ```
 set poi [Param new integer 33]
