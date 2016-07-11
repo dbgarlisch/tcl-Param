@@ -136,7 +136,7 @@ where,
 `value` - The value being assigned to a paramter instance.
 
 `limits` - The parsed representation of `range` returned by
-[VTOR::parseRange](#parseRange).
+[VTOR::parseRange](#parserange).
 
 example,
 ```
