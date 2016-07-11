@@ -11,7 +11,7 @@ Provides the *Param* command ensemble.
   * [getRange](#getrange)
   * [getRangeSignature](#getrangesignature)
   * [getTypedefs](#gettypedefs)
-  * [getValidator](#getValidator)
+  * [getValidator](#getvalidator)
   * [isBasetype](#isbasetype)
   * [isTypedef](#istypedef)
   * [new](#new)
@@ -40,12 +40,11 @@ Where,
 `options` - The cmd dependent options.
 
 ### basetype
-Creates an application defined basetype. Returns nothing. See [Custom Base Types](#custom-base-types).
-
-usage,
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
 ```
+Creates an application defined basetype. Returns nothing. See [Custom Base Types](#custom-base-types).
+
 where,
 
 `name` - The name of the base type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
@@ -55,105 +54,94 @@ where,
 `replace` - If 1, any existing base type definition will be replaced with this one. (default 0)
 
 ### getBasetype
-Returns the base type of a type definition.
-
-usage,
 ```tcl
 Param getBasetype typedefName
 ```
+Returns the base type of a type definition.
+
 where,
 
 `typedefName` - The type definition name.
 
 ### getBasetypes
-Returns a list of all base type names.
-
-usage,
 ```tcl
 Param getBasetypes
 ```
+Returns a list of all base type names.
+
 
 ### getLimits
-Returns the limits for a given type.
-
-usage,
 ```tcl
 Param getLimits type
 ```
+Returns the limits for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
 ### getRange
-Returns the range for a given type.
-
-usage,
 ```tcl
 Param getRange type
 ```
+Returns the range for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
 ### getRangeSignature
-Returns the human readable range signature for a given type.
-
-usage,
 ```tcl
 Param getRangeSignature type
 ```
+Returns the human readable range signature for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
 ### getTypedefs
-Returns a list of all type definition names.
-
-usage,
 ```tcl
 Param getTypedefs
 ```
+Returns a list of all type definition names.
 
 ### getValidator
-Returns the validator namespace name for a given type.
-
-usage,
 ```tcl
 Param getValidator type
 ```
+Returns the validator namespace name for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
 ### isBasetype
-Returns 1 if `name` is a valid base type name.
-
-usage,
 ```tcl
 Param isBasetype name
 ```
+Returns 1 if `name` is a valid base type name.
+
 where,
 
 `name` - The name being tested.
 
 ### isTypedef
-Returns 1 if `name` is a valid type definition name.
-
-usage,
 ```tcl
 Param isTypedef name
 ```
+Returns 1 if `name` is a valid type definition name.
+
 where,
 
 `name` - The name being tested.
 
 ### new
-Creates a parameter object. Returns the parameter object.
-
-usage,
 ```tcl
 Param new type ?val?
 ```
+Creates a parameter object. Returns the parameter object.
+
 where,
 
 `type` - An existing type definition name.
@@ -161,15 +149,14 @@ where,
 `val` - The optional, initial parameter value. The default is type dependent.
 
 ### typedef
+```tcl
+Param typedef basetype name ?range? ?replace?
+```
 Creates an application defined parameter data type. A typedef has its own type name and an optional,
 basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
 `error` is triggered if the assigned value violates the range. The `basetype` must be one of the
 [built-in](#base-data-types) or [user defined](#custom-base-types) base types. Returns nothing.
 
-usage,
-```tcl
-Param typedef basetype name ?range? ?replace?
-```
 where,
 
 `basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
@@ -282,6 +269,7 @@ integer id associated with the currently assigned enum token.
 | {red\|green\|blue\|alpha}   | {\|,red,green,blue,alpha}         |
 | {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
 
+
 ## Custom Base Types
 
 New base types can be added to the Param library. A new base type can be
@@ -349,7 +337,9 @@ variables. See XXXX. OPTIONAL (default {}).
 #### Validator Commands
 
 ##### parseRange
-
+```Tcl
+parseRange { range }
+```
 Parses the range value passed to a typedef that uses this base type. Invoked by
 [Param typedef](#typedef). Returns a parsed representation of `range`. If `range`
 is invalid, a Tcl error should be triggered. REQUIRED.
@@ -360,10 +350,6 @@ is only called once per typedef, it is more efficient to do all heavy processing
 here so that the more frequent calls to [validate](#validate) will be as fast as
 possible.
 
-usage,
-```Tcl
-parseRange { range }
-```
 where,
 
 `range` - A range value passed to [Param typedef](#typedef).
@@ -393,15 +379,13 @@ proc parseRange { range } {
 
 
 ##### validate
-
+```
+proc validate { value limits }
+```
 Validates a value assigned to a parameter instance that uses this base type.
 Invoked by `$param = value`. Returns 1 if `value` is valid or 0 if invalid.
 REQUIRED.
 
-usage,
-```
-proc validate { value limits }
-```
 where,
 
 `value` - The value being assigned to a paramter instance.
@@ -423,16 +407,12 @@ proc validate { value limits } {
 }
 ```
 
-
 ##### registerAliases
-
-Creates one or more aliases for a base type. Invoked by
-[Param basetype](#basetype). Returns nothing. OPTIONAL.
-
-usage,
 ```
 proc registerAliases { }
 ```
+Creates one or more aliases for a base type. Invoked by
+[Param basetype](#basetype). Returns nothing. OPTIONAL.
 
 example,
 ```
@@ -441,6 +421,8 @@ proc registerAliases { } {
   ::Param basetype int [namespace current]
 }
 ```
+
+
 
 <!--
 
