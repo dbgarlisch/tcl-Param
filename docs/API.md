@@ -17,7 +17,7 @@ Provides the *Param* command ensemble.
   * [new](#new)
   * [typedef](#typedef)
 * [Parameter Object Commands](#parameter-object-commands)
-  * [=](#=)
+  * [=](#-setValue)
   * [setValue](#setvalue)
   * [getValue](#getvalue)
   * [getType](#gettype)
@@ -184,12 +184,13 @@ where,
 All parameter objects support the following commands. Additional commands may be added by a
 particular base type (see [VVTOR::objectProto_](#validator-variables)).
 
-### = (equals)
+### = (setValue)
 ```tcl
 $param = val
 ```
 Assignes a new value to the parameter. An error is triggered if the value
-violates the parameter type range. Returns the assigned value.
+violates the parameter type range. Same as the [setValue](#setvalue) command.
+Returns the assigned value.
 
 where,
 
