@@ -16,7 +16,7 @@ Provides the *Param* command ensemble.
   * [isTypedef](#istypedef)
   * [new](#new)
   * [typedef](#typedef)
-* [Param Examples](#param-examples)
+* [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
 * [Builtin Base Types](#builtin-base-types)
@@ -172,7 +172,68 @@ where,
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
 
-## Param Examples
+## Parameter Object Commands
+All parameter objects support the following commands. Additional commands may be added by a
+particular base type (see [VVTOR::objectProto_](#validator-variables)).
+
+### =
+```tcl
+$param = val
+```
+Assignes a new value to the parameter. An error is triggered if the value
+violates the parameter type range. Returns the assigned value.
+
+where,
+
+`val` - The value being assigned.
+
+### setValue
+```tcl
+$param setValue val
+```
+Assignes a new value to the parameter. An error is triggered if the value
+violates the associated range. Returns the assigned value.
+
+where,
+
+`val` - The value being assigned.
+
+### getValue
+```tcl
+$param getValue
+```
+Returns the current parameter value.
+
+### getType
+```tcl
+$param getType
+```
+Returns the paramter type as passed to [Param new](#new).
+
+### getLimits
+```tcl
+$param getLimits
+```
+Returns the parsed `range` value as returned by [VTOR::parseRange](#parseRange).
+The exact structure of this value is base type dependent and is typically not
+used or needed by an application except for debugging.
+
+### getRange
+```tcl
+$param getRange
+```
+Returns the unparsed `range` value passed to [Param typedef](#typedef).
+
+### dump
+```tcl
+$param dump
+```
+Returns a text representation of the parameter as
+```
+"${self_}: type($type_) value($val_)".
+```
+
+## Usage Examples
 
 ### Base Type Params
 Base types that support typedefs (see [VTOR::createTypedef_](#validator-variables)) can be used
@@ -429,9 +490,9 @@ Parses the range value passed to a typedef that uses this base type. Invoked by
 is invalid, a Tcl error should be triggered. REQUIRED.
 
 The returned value is never used outside of the validator. It is stored as-is and
-later passed in the `limits` argument of [validate](#validate). Since `parseRange`
+later passed in the `limits` argument of [VTOR::validate](#validate). Since `parseRange`
 is only called once per typedef, it is more efficient to do all heavy processing
-here so that the more frequent calls to [validate](#validate) will be as fast as
+here so that the more frequent calls to [VTOR::validate](#validate) will be as fast as
 possible.
 
 where,
@@ -476,7 +537,7 @@ where,
 `value` - The value being assigned to a paramter instance.
 
 `limits` - The parsed representation of `range` returned by
-[parseRange](#parseRange).
+[VTOR::parseRange](#parseRange).
 
 example,
 ```
