@@ -4,18 +4,18 @@ Provides the *Param* command ensemble.
 
 ### Table of Contents
 * [Param Commands](#param-commands)
-  * [basetype](#basetype)
-  * [getBasetype](#getbasetype)
-  * [getBasetypes](#getbasetypes)
-  * [getLimits](#getlimits)
-  * [getRange](#getrange)
-  * [getRangeSignature](#getrangesignature)
-  * [getTypedefs](#gettypedefs)
-  * [getValidator](#getvalidator)
-  * [isBasetype](#isbasetype)
-  * [isTypedef](#istypedef)
-  * [new](#new)
-  * [typedef](#typedef)
+  * [basetype](#param-basetype)
+  * [getBasetype](#param-getbasetype)
+  * [getBasetypes](#param-getbasetypes)
+  * [getLimits](#param-getlimits)
+  * [getRange](#param-getrange)
+  * [getRangeSignature](#param-getrangesignature)
+  * [getTypedefs](#param-gettypedefs)
+  * [getValidator](#param-getvalidator)
+  * [isBasetype](#param-isbasetype)
+  * [isTypedef](#param-istypedef)
+  * [new](#param-new)
+  * [typedef](#param-typedef)
 * [Parameter Object Commands](#parameter-object-commands)
   * [=](#-setvalue)
   * [setValue](#setvalue)
@@ -52,7 +52,7 @@ Where,
 
 `options` - The cmd dependent options.
 
-### basetype
+### Param basetype
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
 ```
@@ -66,7 +66,7 @@ where,
 
 `replace` - If 1, any existing base type definition will be replaced with this one. (default 0)
 
-### getBasetype
+### Param getBasetype
 ```tcl
 Param getBasetype typedefName
 ```
@@ -76,14 +76,14 @@ where,
 
 `typedefName` - The type definition name.
 
-### getBasetypes
+### Param getBasetypes
 ```tcl
 Param getBasetypes
 ```
 Returns a list of all base type names.
 
 
-### getLimits
+### Param getLimits
 ```tcl
 Param getLimits type
 ```
@@ -93,7 +93,7 @@ where,
 
 `type` - Is a type definition or base type name.
 
-### getRange
+### Param getRange
 ```tcl
 Param getRange type
 ```
@@ -103,7 +103,7 @@ where,
 
 `type` - Is a type definition or base type name.
 
-### getRangeSignature
+### Param getRangeSignature
 ```tcl
 Param getRangeSignature type
 ```
@@ -113,13 +113,13 @@ where,
 
 `type` - Is a type definition or base type name.
 
-### getTypedefs
+### Param getTypedefs
 ```tcl
 Param getTypedefs
 ```
 Returns a list of all type definition names.
 
-### getValidator
+### Param getValidator
 ```tcl
 Param getValidator type
 ```
@@ -129,7 +129,7 @@ where,
 
 `type` - Is a type definition or base type name.
 
-### isBasetype
+### Param isBasetype
 ```tcl
 Param isBasetype name
 ```
@@ -139,7 +139,7 @@ where,
 
 `name` - The name being tested.
 
-### isTypedef
+### Param isTypedef
 ```tcl
 Param isTypedef name
 ```
@@ -149,7 +149,7 @@ where,
 
 `name` - The name being tested.
 
-### new
+### Param new
 ```tcl
 Param new type ?val?
 ```
@@ -161,7 +161,7 @@ where,
 
 `val` - The optional, initial parameter value. The default is type dependent.
 
-### typedef
+### Param typedef
 ```tcl
 Param typedef basetype name ?range? ?replace?
 ```
@@ -184,7 +184,7 @@ where,
 All parameter objects support the following commands. Additional commands may be added by a
 particular base type (see [VVTOR::objectProto_](#validator-variables)).
 
-### = (setValue)
+### $param =
 ```tcl
 $param = val
 ```
@@ -196,7 +196,7 @@ where,
 
 `val` - The value being assigned.
 
-### setValue
+### $param setValue
 ```tcl
 $param setValue val
 ```
@@ -207,19 +207,19 @@ where,
 
 `val` - The value being assigned.
 
-### getValue
+### $param getValue
 ```tcl
 $param getValue
 ```
 Returns the current parameter value.
 
-### getType
+### $param getType
 ```tcl
 $param getType
 ```
 Returns the paramter type as passed to [Param new](#new).
 
-### getLimits
+### $param getLimits
 ```tcl
 $param getLimits
 ```
@@ -227,13 +227,13 @@ Returns the parsed `range` value as returned by [VTOR::parseRange](#parseRange).
 The exact structure of this value is base type dependent and is typically not
 used or needed by an application except for debugging.
 
-### getRange
+### $param getRange
 ```tcl
 $param getRange
 ```
 Returns the unparsed `range` value passed to [Param typedef](#typedef).
 
-### dump
+### $param dump
 ```tcl
 $param dump
 ```
