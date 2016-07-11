@@ -13,9 +13,9 @@ See [Validators](#validators).
 * [Validators](#validators)
   * [Validator Variables](#validator-variables)
   * [Validator Commands](#validator-commands)
-    * parseRange
-    * validate
-    * registerAliases
+    * [parseRange](#parserange)
+    * [validate](#validate)
+    * [registerAliases](#registeraliases)
 
 ## Base Type Definition File
 
