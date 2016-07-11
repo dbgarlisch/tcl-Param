@@ -14,15 +14,12 @@ Several base type aliases are also defined.
 | `string`  | `text`          |
 
 ### Table of Contents
-* [Ranges](#ranges)
-  * [double range](#double)
-  * [integer range](#integer)
-  * [string range](#string)
-  * [enum range](#enum)
+* [double range](#double)
+* [integer range](#integer)
+* [string range](#string)
+* [enum range](#enum)
 
-## Ranges
-
-### double
+## double
 
 Range: `?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??`
 
@@ -41,7 +38,7 @@ empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0.0 <= value <= Inf  |
 | {}        | Inf <= value <= Inf  |
 
-### integer
+## integer
 
 Range: `?Inf|minLimit ?Inf|maxLimit??`
 
@@ -55,7 +52,7 @@ unlimited value. If the range is empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0 <= value <= Inf    |
 | {}        | Inf <= value <= Inf  |
 
-### string
+## string
 
 Range: `?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???`
 
@@ -80,7 +77,7 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | {r/^big.*$/it 4 7} | regexp, nocase, trim, length 4 to 7 |
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
 
-### enum
+## enum
 
 Range: `?|<CHAR>?token?=integer? ?|token?=integer??...`
 
