@@ -16,6 +16,7 @@ Provides the *Param* command ensemble.
   * [isTypedef](#istypedef)
   * [new](#new)
   * [typedef](#typedef)
+* [Param Examples](#param-examples)
 * [Builtin Base Types](#builtin-base-types)
   * [double range](#double)
   * [integer range](#integer)
@@ -168,6 +169,78 @@ where,
 `range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
+
+## Param Examples
+
+### Base Type Params
+Base types that support typedefs (see [VTOR::createTypedef_](#validator-variables)) can be used
+for parameters. These parameters will have an unlimited range.
+```
+set poi [Param new integer 33]
+$poi = 77
+
+set pod [Param new double 33.33]
+$pod = 77.77
+
+# real is an alias of double
+set por [Param new real 44.55]
+$por = 66.88
+
+set pos [Param new string {hello}]
+$pos = {world!}
+
+# enum requires a range! It must be typedef'ed.
+set enum [Param new enum] ;# ERROR
+```
+
+
+### Typedef Params
+Typedefs can be used to define ranges for base types.
+```
+Param typedef integer iMonth {1 12}
+set imon [Param new iMonth 3]
+$imon = 7
+$imon setValue 8
+$imon = 13 ;# ERROR
+
+Param typedef double Scale {>0 10}
+set scale [Param new Scale 0.9]
+$scale = 0.4
+$scale setValue 5.5
+$scale = 0 ;# ERROR
+
+# regex string typedef
+Param typedef string BigStrR {r/^big\S{1,4}$/it}
+set bigStr [Param new BigStrR "BigStr"]
+$bigStr = "Big1234"
+$bigStr = "big" ;# ERROR
+$bigStr setValue "Big12345" ;# ERROR
+
+Param typedef string BigStrG {g/big*/it 4 7}
+set bigStrg [Param new BigStrR "BigStr"]
+$bigStrg = "Big1234"
+$bigStrg = "big" ;# ERROR
+$bigStrg setValue "Big12345" ;# ERROR
+
+Param typedef enum ColorComponent {red|green|blue=5|alpha}
+set ccomp [Param new ColorComponent "red"]
+$ccomp setValue "green"
+$ccomp = "blue"
+# Call enum-defined getId object command
+puts "$ccomp id([$ccomp getId])" ;# id is 5 for "blue"
+# Call enum-defined getTokenId typedef command
+puts "ColorComponent getTokenId(alpha=[ColorComponent getTokenId alpha])"
+
+# print a table of base type range signatures
+set fmt "| %-15.15s | %-60.60s |"
+set dashes [string repeat - 100]
+puts {}
+puts [format $fmt "Basetype" "Range Signature"]
+puts [format $fmt $dashes $dashes]
+foreach basetype [Param getBasetypes] {
+ puts [format $fmt $basetype [Param getRangeSignature $basetype]]
+}
+```
 
 
 ## Builtin Base Types
