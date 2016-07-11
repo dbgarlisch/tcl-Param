@@ -24,6 +24,8 @@ Provides the *Param* command ensemble.
 * [Custom Base Types](#custom-base-types)
   * [Base Type Definition File](#base-type-definition-file)
   * [Validators](#validators)
+    * [Validator Variables](#validator-variables)
+    * [Validator Commands](#validator-commands)
 
 
 ## Param Commands
@@ -302,7 +304,8 @@ A validator is a Tcl namespace that provides one or more procs and variables use
 Param library. The validator namespace must be unique and must exist before the call
 to `Param basetype`.
 
-A validator implements the following variable and procs.
+A validator implements the following variable and procs. In the following sections, VTOR
+is a place holder for the actual validator namespace name.
 ```tcl
 namespace eval VTOR {
   variable rangeSignature_ {signature-pattern}                          ;# REQUIRED
@@ -317,19 +320,19 @@ namespace eval VTOR {
 
 #### Validator Variables
 
-`rangeSignature_` - Provides the base type's human readable range signature
+`VTOR::rangeSignature_` - Provides the base type's human readable range signature
 pattern string. This should describe the range value expected by the validator's
 parseRange proc. This string is primarily used for error reporting. REQUIRED.
 
-`createTypedef_` - If 1, a typedef is created with the same name as the base
+`VTOR::createTypedef_` - If 1, a typedef is created with the same name as the base
 type. If 0, a typedef is not created. OPTIONAL (default 1).
 
-`objectProto_` - Defines one or more base type specific variables or procs
+`VTOR::objectProto_` - Defines one or more base type specific variables or procs
 that are added to all Param instances of this base type. See [Param new](#new).
 These variables and procs extend a Param instance beyond its base procs and
 variables. See XXXX. OPTIONAL (default {}).
 
-`staticProto_` - Defines one or more typedef specific variables or procs
+`VTOR::staticProto_` - Defines one or more typedef specific variables or procs
 that are added to all typedefs of this base type. See [Param typedef](#typedef).
 These variables and procs extend a typedef beyond its base procs and
 variables. See XXXX. OPTIONAL (default {}).
@@ -338,7 +341,7 @@ variables. See XXXX. OPTIONAL (default {}).
 
 ##### parseRange
 ```Tcl
-parseRange { range }
+VTOR::parseRange { range }
 ```
 Parses the range value passed to a typedef that uses this base type. Invoked by
 [Param typedef](#typedef). Returns a parsed representation of `range`. If `range`
@@ -380,7 +383,7 @@ proc parseRange { range } {
 
 ##### validate
 ```
-proc validate { value limits }
+VTOR::validate { value limits }
 ```
 Validates a value assigned to a parameter instance that uses this base type.
 Invoked by `$param = value`. Returns 1 if `value` is valid or 0 if invalid.
@@ -409,9 +412,9 @@ proc validate { value limits } {
 
 ##### registerAliases
 ```
-proc registerAliases { }
+VTOR::registerAliases { }
 ```
-Creates one or more aliases for a base type. Invoked by
+Creates one or more aliases for a base type. Invoked once by
 [Param basetype](#basetype). Returns nothing. OPTIONAL.
 
 example,
@@ -421,233 +424,3 @@ proc registerAliases { } {
   ::Param basetype int [namespace current]
 }
 ```
-
-
-
-<!--
-
-```Tcl
-pw::listutils lproduct get <list> ?<list> ...?
-```
-Returns the product as a list of sub-product lists.
-<dl>
-  <dt><code>list ?lists ...?</code></dt>
-  <dd>One or more lists used used to compute the product.</dd>
-</dl>
-<br/>
-
-```Tcl
-pw::listutils lproduct foreach <varname> <list> ?<list> ...? <body>
-```
-Each sub-product is passed to the script defined by body using the specified
-varname.
-
-<dl>
-  <dt><code>varname</code></dt>
-  <dd>Name of the sub-product script variable.</dd>
-  <dt><code>list ?lists ...?</code></dt>
-  <dd>One or more lists used used to compute the product.</dd>
-  <dt><code>body</code></dt>
-  <dd>The script to execute for each sub-product.</dd>
-</dl>
-<br/>
-
-### lmutate
-
-```Tcl
-pw::listutils lmutate <subcmd> ?<options>?
-```
-Computes the permutations of a list.
-
-For example, the permutations of `{a b c}` are `{{a b c} {a c b} {b a c} {b c a}
-{c b a} {c a b}}`.
-
-<dl>
-  <dt><code>subCmd</code></dt>
-  <dd>One of get or foreach.</dd>
-</dl>
-<br/>
-
-```Tcl
-pw::listutils lmutate get <list>
-```
-Returns the permutations as a list of lists.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>The list to mutate.</dd>
-</dl>
-<br/>
-
-```Tcl
-pw::listutils lmutate foreach <varname> <list> <body>
-```
-Each permutation is passed to the script defined by body using the specified
-varname.
-
-<dl>
-  <dt><code>varname</code></dt>
-  <dd>Name of the permutation script variable.</dd>
-  <dt><code>list</code></dt>
-  <dd>The list to mutate.</dd>
-  <dt><code>body</code></dt>
-  <dd>The script to execute for each permutation.</dd>
-</dl>
-<br/>
-
-### lunion
-
-```Tcl
-pw::listutils lunion ?<list> ...?
-```
-Returns the union of a collection of lists.
-
-For example, the union of `{1 2 3}` and `{a b}` is `{1 2 3 a b}`.
-<dl>
-  <dt><code>list ...</code></dt>
-  <dd>The lists used used to compute the union. If no lists are provided, an
-  empty list is returned.</dd>
-</dl>
-<br/>
-
-### lintersect
-
-```Tcl
-pw::listutils lintersect <list> <list> ?<list> ...?
-```
-Returns the intersection of a collection of lists.
-
-For example, the intersection of `{1 2 3 a}` and `{a 2 z}` is `{a 2}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>Two or more lists used used to compute the intersection.</dd>
-</dl>
-<br/>
-
-### lsubtract
-
-```Tcl
-pw::listutils lsubtract <list> <list> ?<list> ...?
-```
-Returns the left-to-rigth subtraction of a collection of lists.
-
-For example, the subtraction of `{1 2 3 a}` and `{a 2 z}` is `{1 3}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>Two or more lists used used to compute the subtraction.</dd>
-</dl>
-<br/>
-
-### lsymmetricdiff
-
-```Tcl
-pw::listutils lsymmetricdiff <list> <list> ?<list> ...?
-```
-Returns the symmetric difference of a collection of lists. A symmetric
-difference of A and B is equivalent to ((A subtract B) union (B subtract A)).
-
-For example, the symmetric difference of `{1 2 3 a}` and `{a 2 z}` is `{1 3 z}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>Two or more lists used used to compute the symmetricdifference.</dd>
-</dl>
-<br/>
-
-### lissubset
-
-```Tcl
-pw::listutils lissubset <superlist> <sublist> ?<sublist> ...?
-```
-Returns true if all sublist lists are a subset of superlist.
-
-For example, `{1 a}` is a sublist of `{1 2 3 a}`.
-<dl>
-  <dt><code>superlist</code></dt>
-  <dd>The list to compare all sublists against.</dd>
-  <dt><code>sublist</code></dt>
-  <dd>One or more subset lists.</dd>
-</dl>
-<br/>
-
-### lunique
-
-```Tcl
-pw::listutils lunique <list>
-```
-Returns a copy of list with all duplicates removed.
-
-For example, `lunique {1 a b c 2 3 1 b 9}` returns `{1 a b c 2 3 9}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>The list to process.</dd>
-</dl>
-<br/>
-
-### lremove
-
-```Tcl
-pw::listutils lremove <listvarname> <value> ?<options>?
-```
-Removes the requested value from the list. Returns nothing.
-
-For example, `set lst {a b c d e} ; lremove lst c -sorted` sets `$lst` equal
-to `{a b d e}`.
-<dl>
-  <dt><code>listvarname</code></dt>
-  <dd>The list to process.</dd>
-  <dt><code>value</code></dt>
-  <dd>The value to remove from the list.</dd>
-  <dt><code>options</code></dt>
-  <dd>Any options supported by `lsearch <options> $lst $value`.</dd>
-</dl>
-<br/>
-
-### lstitch
-
-```Tcl
-pw::listutils lstitch <list1> ?<list2>? ?<repeat>?
-```
-Returns a single list comprised of alternating values from the `list1` and
-`list2`. The returned list will be the same length as `list1` and can be used
-as a `dict`.
-
-For example, `lstitch {1 2 3 4} {a b c d}` returns `{1 a 2 b 3 c 4 d}`.
-<dl>
-  <dt><code>list1</code></dt>
-  <dd>The list of dict keys.</dd>
-  <dt><code>list2</code></dt>
-  <dd>The list of dict values.</dd>
-  <dt><code>repeat</code></dt>
-  <dd>If 1, `list2` will be repeated as needed to provide values for `list1`.
-  If 0, any unmatched keys will have a value of {}. The default is 0.</dd>
-</dl>
-<br/>
-
-### lshift
-
-```Tcl
-pw::listutils lshift <listvarname>
-```
-Removes the first item from list and returns it. The list is modifed by this
-proc. If the list is empty, {} is returned.
-
-For example, `set lst {1 2 3 4} ; lshift $lst` returns `1` and sets `$lst` equal
-to `{2 3 4}`.
-<dl>
-  <dt><code>listvarname</code></dt>
-  <dd>The list to process.</dd>
-</dl>
-<br/>
-
-
-
-### pw::listutils Library Usage Examples
-
-#### Example 1
-
-```Tcl
-    xxxx
-```
-
-[SetWiki]: http://en.wikipedia.org/wiki/Set_%28mathematics%29
-
--->
