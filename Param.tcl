@@ -306,6 +306,8 @@ proc ::Param::unitTest {} {
   $poi dump
   $poi = 77
   $poi dump
+  puts "poi =: [$poi = 99]"
+  puts "poi setValue: [$poi setValue 88]"
 
   puts {}
   set pod [Param new double 33.33]
