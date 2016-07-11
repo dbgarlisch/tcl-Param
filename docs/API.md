@@ -16,6 +16,14 @@ Provides the *Param* command ensemble.
   * [isTypedef](#istypedef)
   * [new](#new)
   * [typedef](#typedef)
+* [Parameter Object Commands](#parameter-object-commands)
+  * [=](#=)
+  * [setValue](#setvalue)
+  * [getValue](#getvalue)
+  * [getType](#gettype)
+  * [getLimits](#getlimits)
+  * [getRange](#getrange)
+  * [dump](#dump)
 * [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
@@ -176,7 +184,7 @@ where,
 All parameter objects support the following commands. Additional commands may be added by a
 particular base type (see [VVTOR::objectProto_](#validator-variables)).
 
-### =
+### = (equals)
 ```tcl
 $param = val
 ```
