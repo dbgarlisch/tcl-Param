@@ -4,13 +4,39 @@ Provides the *Param* command ensemble.
 
 ### Table of Contents
 * [Param Commands](#param-commands)
+  * [basetype](#param-basetype)
+  * [getBasetype](#param-getbasetype)
+  * [getBasetypes](#param-getbasetypes)
+  * [getLimits](#param-getlimits)
+  * [getRange](#param-getrange)
+  * [getRangeSignature](#param-getrangesignature)
+  * [getTypedefs](#param-gettypedefs)
+  * [getValidator](#param-getvalidator)
+  * [isBasetype](#param-isbasetype)
+  * [isTypedef](#param-istypedef)
+  * [new](#param-new)
+  * [typedef](#param-typedef)
+* [Parameter Object Commands](#parameter-object-commands)
+  * [=](#-setvalue)
+  * [setValue](#setvalue)
+  * [getValue](#getvalue)
+  * [getType](#gettype)
+  * [getLimits](#getlimits)
+  * [getRange](#getrange)
+  * [dump](#dump)
+* [Usage Examples](#usage-examples)
+  * [Base Type Params](#base-type-params)
+  * [Typedef Params](#typedef-params)
 * [Builtin Base Types](#builtin-base-types)
   * [double range](#double)
   * [integer range](#integer)
   * [string range](#string)
   * [enum range](#enum)
 * [Custom Base Types](#custom-base-types)
+  * [Base Type Definition File](#base-type-definition-file)
   * [Validators](#validators)
+    * [Validator Variables](#validator-variables)
+    * [Validator Commands](#validator-commands)
 
 
 ## Param Commands
@@ -26,11 +52,12 @@ Where,
 
 `options` - The cmd dependent options.
 
-### basetype
-Creates an application defined basetype. Returns nothing See [Custom Base Types](#custom-base-types).
+### Param basetype
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
 ```
+Creates an application defined basetype. Returns nothing. See [Custom Base Types](#custom-base-types).
+
 where,
 
 `name` - The name of the base type being created. An error is triggered if `name` is not unique unless `replace` is set to 1.
@@ -39,100 +66,110 @@ where,
 
 `replace` - If 1, any existing base type definition will be replaced with this one. (default 0)
 
-### getBasetype
-Returns the base type of a type definition.
+### Param getBasetype
 ```tcl
 Param getBasetype typedefName
 ```
+Returns the base type of a type definition.
+
 where,
 
 `typedefName` - The type definition name.
 
-### getBasetypes
-Returns a list of all base type names.
+### Param getBasetypes
 ```tcl
 Param getBasetypes
 ```
+Returns a list of all base type names.
 
-### getLimits
-Returns the limits for a given type.
+
+### Param getLimits
 ```tcl
 Param getLimits type
 ```
+Returns the limits for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
-### getRange
-Returns the range for a given type.
+### Param getRange
 ```tcl
 Param getRange type
 ```
+Returns the range for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
-### getRangeSignature
-Returns the human readable range signature for a given type.
+### Param getRangeSignature
 ```tcl
 Param getRangeSignature type
 ```
+Returns the human readable range signature for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
-### getTypedefs
-Returns a list of all type definition names.
+### Param getTypedefs
 ```tcl
 Param getTypedefs
 ```
+Returns a list of all type definition names.
 
-### getValidator
-Returns the validator namespace name for a given type.
+### Param getValidator
 ```tcl
 Param getValidator type
 ```
+Returns the validator namespace name for a given type.
+
 where,
 
 `type` - Is a type definition or base type name.
 
-### isBasetype
-Returns 1 if `name` is a valid base type name.
+### Param isBasetype
 ```tcl
 Param isBasetype name
 ```
+Returns 1 if `name` is a valid base type name.
+
 where,
 
 `name` - The name being tested.
 
-### isTypedef
-Returns 1 if `name` is a valid type definition name.
+### Param isTypedef
 ```tcl
 Param isTypedef name
 ```
+Returns 1 if `name` is a valid type definition name.
+
 where,
 
 `name` - The name being tested.
 
-### new
-Creates a parameter object. Returns the parameter object.
+### Param new
 ```tcl
 Param new type ?val?
 ```
+Creates a parameter object. Returns the parameter object.
+
 where,
 
 `type` - An existing type definition name.
 
 `val` - The optional, initial parameter value. The default is type dependent.
 
-### typedef
+### Param typedef
+```tcl
+Param typedef basetype name ?range? ?replace?
+```
 Creates an application defined parameter data type. A typedef has its own type name and an optional,
 basetype-specific value range. When assigning a parameter value, this range will be enforced. A Tcl
 `error` is triggered if the assigned value violates the range. The `basetype` must be one of the
 [built-in](#base-data-types) or [user defined](#custom-base-types) base types. Returns nothing.
-```tcl
-Param typedef basetype name ?range? ?replace?
-```
+
 where,
 
 `basetype` - One of the [built in](#builtin-base-types) or [user defined](#custom-base-types) base types. See the [basetype](#basetype) command.
@@ -142,6 +179,140 @@ where,
 `range` - The optional, base type specific range. See [Ranges](#ranges). (default {})
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
+
+## Parameter Object Commands
+All parameter objects support the following commands. Additional commands may be added by a
+particular base type (see [VVTOR::objectProto_](#validator-variables)).
+
+### = (setValue)
+```tcl
+$param = val
+```
+Assignes a new value to the parameter. An error is triggered if the value
+violates the parameter type range. Same as the [setValue](#setvalue) command.
+Returns the assigned value.
+
+where,
+
+`val` - The value being assigned.
+
+### setValue
+```tcl
+$param setValue val
+```
+Assignes a new value to the parameter. An error is triggered if the value
+violates the associated range. Returns the assigned value.
+
+where,
+
+`val` - The value being assigned.
+
+### getValue
+```tcl
+$param getValue
+```
+Returns the current parameter value.
+
+### getType
+```tcl
+$param getType
+```
+Returns the paramter type as passed to [Param new](#new).
+
+### getLimits
+```tcl
+$param getLimits
+```
+Returns the parsed `range` value as returned by [VTOR::parseRange](#parseRange).
+The exact structure of this value is base type dependent and is typically not
+used or needed by an application except for debugging.
+
+### getRange
+```tcl
+$param getRange
+```
+Returns the unparsed `range` value passed to [Param typedef](#typedef).
+
+### dump
+```tcl
+$param dump
+```
+Returns a text representation of the parameter as
+```
+"${self_}: type($type_) value($val_)".
+```
+
+## Usage Examples
+
+### Base Type Params
+Base types that support typedefs (see [VTOR::createTypedef_](#validator-variables)) can be used
+for parameters. These parameters will have an unlimited range.
+```
+set poi [Param new integer 33]
+$poi = 77
+
+set pod [Param new double 33.33]
+$pod = 77.77
+
+# real is an alias of double
+set por [Param new real 44.55]
+$por = 66.88
+
+set pos [Param new string {hello}]
+$pos = {world!}
+
+# enum requires a range! It must be typedef'ed.
+set enum [Param new enum] ;# ERROR
+```
+
+
+### Typedef Params
+Typedefs can be used to define ranges for base types.
+```
+Param typedef integer iMonth {1 12}
+set imon [Param new iMonth 3]
+$imon = 7
+$imon setValue 8
+$imon = 13 ;# ERROR
+
+Param typedef double Scale {>0 10}
+set scale [Param new Scale 0.9]
+$scale = 0.4
+$scale setValue 5.5
+$scale = 0 ;# ERROR
+
+# regex string typedef
+Param typedef string BigStrR {r/^big\S{1,4}$/it}
+set bigStr [Param new BigStrR "BigStr"]
+$bigStr = "Big1234"
+$bigStr = "big" ;# ERROR
+$bigStr setValue "Big12345" ;# ERROR
+
+Param typedef string BigStrG {g/big*/it 4 7}
+set bigStrg [Param new BigStrR "BigStr"]
+$bigStrg = "Big1234"
+$bigStrg = "big" ;# ERROR
+$bigStrg setValue "Big12345" ;# ERROR
+
+Param typedef enum ColorComponent {red|green|blue=5|alpha}
+set ccomp [Param new ColorComponent "red"]
+$ccomp setValue "green"
+$ccomp = "blue"
+# Call enum-defined getId object command
+puts "$ccomp id([$ccomp getId])" ;# id is 5 for "blue"
+# Call enum-defined getTokenId typedef command
+puts "ColorComponent getTokenId(alpha=[ColorComponent getTokenId alpha])"
+
+# print a table of base type range signatures
+set fmt "| %-15.15s | %-60.60s |"
+set dashes [string repeat - 100]
+puts {}
+puts [format $fmt "Basetype" "Range Signature"]
+puts [format $fmt $dashes $dashes]
+foreach basetype [Param getBasetypes] {
+ puts [format $fmt $basetype [Param getRangeSignature $basetype]]
+}
+```
 
 
 ## Builtin Base Types
@@ -245,28 +416,38 @@ integer id associated with the currently assigned enum token.
 | {red\|green\|blue\|alpha}   | {\|,red,green,blue,alpha}         |
 | {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
 
+
 ## Custom Base Types
 
-You can add a custom, user defined base types to the Param library. A base type uses a validator
-to implement the base type's behavior. The Param library auto loads all base type
-definition files found in the `basetypes` subdirectory that are named
-`NAME?-VTOR?.basetype.tcl`. Where `NAME` is the base type's name and `VTOR` is the
-validator name used for this base type. If not provided, `VTOR` defaults to `NAME`.
-For example:
+New base types can be added to the Param library. A new base type can be
+explicitly added by an application using the [basetype](#basetype) command
+or automatically added by creating a
+[Base Type Definition File](#base-type-definition-file).
 
-* *real.basetype.tcl* defines
-  * A base type named *real*
-  * Using a validator named *real*
-* *real-vtor.basetype.tcl* defines
-  * A base type named *real*
-  * Using a validator named *vtor*
+Each base type uses a validator to implement its behavior.
+See [Validators](#validators).
 
-If you do not want to autoload an application defined base type, you can load it
-explicitly using the `Param basetype` command.
+### Base Type Definition File
 
-```tcl
-Param basetype name {vtorNamespace {}} {replace 0}
+The Param library auto loads all base type definition files found in the `basetypes`
+subdirectory. A base type definition file contains the named validator's implementation.
+Base type definition files require a naming convention.
 ```
+NAME?-VTOR?.basetype.tcl
+```
+where,
+
+`NAME` - The base type's name.
+
+`VTOR` - The validator's name. If not provided, `VTOR` defaults to `NAME`.
+
+For example, a base type definition file named:
+* *real.basetype.tcl*
+  * Defines a base type named *real*
+  * Implements a validator named *real*
+* *real-vtor.basetype.tcl*
+  * Defines a base type named *real*
+  * Implements a validator named *vtor*
 
 ### Validators
 
@@ -274,10 +455,10 @@ A validator is a Tcl namespace that provides one or more procs and variables use
 Param library. The validator namespace must be unique and must exist before the call
 to `Param basetype`.
 
-A validator implements the following variable and procs.
-
+A validator implements the following variable and procs. In the following sections, VTOR
+is a place holder for the actual validator namespace name.
 ```tcl
-namespace eval NSPACE {
+namespace eval VTOR {
   variable rangeSignature_ {signature-pattern}                          ;# REQUIRED
   variable createTypedef_ 1                                             ;# OPTIONAL
   variable objectProto_ {commands added to objects of basetype}         ;# OPTIONAL
@@ -288,232 +469,112 @@ namespace eval NSPACE {
 }
 ```
 
+#### Validator Variables
 
+`VTOR::rangeSignature_` - Provides the base type's human readable range signature
+pattern string. This should describe the range value expected by the validator's
+parseRange proc. This string is primarily used for error reporting. REQUIRED.
 
-<!--
+`VTOR::createTypedef_` - If 1, a typedef is created with the same name as the base
+type. If 0, a typedef is not created. OPTIONAL (default 1).
 
+`VTOR::objectProto_` - Defines one or more base type specific variables or procs
+that are added to all Param instances of this base type. See [Param new](#new).
+These variables and procs extend a Param instance beyond its base procs and
+variables. See XXXX. OPTIONAL (default {}).
+
+`VTOR::staticProto_` - Defines one or more typedef specific variables or procs
+that are added to all typedefs of this base type. See [Param typedef](#typedef).
+These variables and procs extend a typedef beyond its base procs and
+variables. See XXXX. OPTIONAL (default {}).
+
+#### Validator Commands
+
+##### parseRange
 ```Tcl
-pw::listutils lproduct get <list> ?<list> ...?
+VTOR::parseRange { range }
 ```
-Returns the product as a list of sub-product lists.
-<dl>
-  <dt><code>list ?lists ...?</code></dt>
-  <dd>One or more lists used used to compute the product.</dd>
-</dl>
-<br/>
+Parses the range value passed to a typedef that uses this base type. Invoked by
+[Param typedef](#typedef). Returns a parsed representation of `range`. If `range`
+is invalid, a Tcl error should be triggered. REQUIRED.
 
-```Tcl
-pw::listutils lproduct foreach <varname> <list> ?<list> ...? <body>
+The returned value is never used outside of the validator. It is stored as-is and
+later passed in the `limits` argument of [VTOR::validate](#validate). Since `parseRange`
+is only called once per typedef, it is more efficient to do all heavy processing
+here so that the more frequent calls to [VTOR::validate](#validate) will be as fast as
+possible.
+
+where,
+
+`range` - A range value passed to [Param typedef](#typedef).
+
+example,
 ```
-Each sub-product is passed to the script defined by body using the specified
-varname.
-
-<dl>
-  <dt><code>varname</code></dt>
-  <dd>Name of the sub-product script variable.</dd>
-  <dt><code>list ?lists ...?</code></dt>
-  <dd>One or more lists used used to compute the product.</dd>
-  <dt><code>body</code></dt>
-  <dd>The script to execute for each sub-product.</dd>
-</dl>
-<br/>
-
-### lmutate
-
-```Tcl
-pw::listutils lmutate <subcmd> ?<options>?
-```
-Computes the permutations of a list.
-
-For example, the permutations of `{a b c}` are `{{a b c} {a c b} {b a c} {b c a}
-{c b a} {c a b}}`.
-
-<dl>
-  <dt><code>subCmd</code></dt>
-  <dd>One of get or foreach.</dd>
-</dl>
-<br/>
-
-```Tcl
-pw::listutils lmutate get <list>
-```
-Returns the permutations as a list of lists.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>The list to mutate.</dd>
-</dl>
-<br/>
-
-```Tcl
-pw::listutils lmutate foreach <varname> <list> <body>
-```
-Each permutation is passed to the script defined by body using the specified
-varname.
-
-<dl>
-  <dt><code>varname</code></dt>
-  <dd>Name of the permutation script variable.</dd>
-  <dt><code>list</code></dt>
-  <dd>The list to mutate.</dd>
-  <dt><code>body</code></dt>
-  <dd>The script to execute for each permutation.</dd>
-</dl>
-<br/>
-
-### lunion
-
-```Tcl
-pw::listutils lunion ?<list> ...?
-```
-Returns the union of a collection of lists.
-
-For example, the union of `{1 2 3}` and `{a b}` is `{1 2 3 a b}`.
-<dl>
-  <dt><code>list ...</code></dt>
-  <dd>The lists used used to compute the union. If no lists are provided, an
-  empty list is returned.</dd>
-</dl>
-<br/>
-
-### lintersect
-
-```Tcl
-pw::listutils lintersect <list> <list> ?<list> ...?
-```
-Returns the intersection of a collection of lists.
-
-For example, the intersection of `{1 2 3 a}` and `{a 2 z}` is `{a 2}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>Two or more lists used used to compute the intersection.</dd>
-</dl>
-<br/>
-
-### lsubtract
-
-```Tcl
-pw::listutils lsubtract <list> <list> ?<list> ...?
-```
-Returns the left-to-rigth subtraction of a collection of lists.
-
-For example, the subtraction of `{1 2 3 a}` and `{a 2 z}` is `{1 3}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>Two or more lists used used to compute the subtraction.</dd>
-</dl>
-<br/>
-
-### lsymmetricdiff
-
-```Tcl
-pw::listutils lsymmetricdiff <list> <list> ?<list> ...?
-```
-Returns the symmetric difference of a collection of lists. A symmetric
-difference of A and B is equivalent to ((A subtract B) union (B subtract A)).
-
-For example, the symmetric difference of `{1 2 3 a}` and `{a 2 z}` is `{1 3 z}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>Two or more lists used used to compute the symmetricdifference.</dd>
-</dl>
-<br/>
-
-### lissubset
-
-```Tcl
-pw::listutils lissubset <superlist> <sublist> ?<sublist> ...?
-```
-Returns true if all sublist lists are a subset of superlist.
-
-For example, `{1 a}` is a sublist of `{1 2 3 a}`.
-<dl>
-  <dt><code>superlist</code></dt>
-  <dd>The list to compare all sublists against.</dd>
-  <dt><code>sublist</code></dt>
-  <dd>One or more subset lists.</dd>
-</dl>
-<br/>
-
-### lunique
-
-```Tcl
-pw::listutils lunique <list>
-```
-Returns a copy of list with all duplicates removed.
-
-For example, `lunique {1 a b c 2 3 1 b 9}` returns `{1 a b c 2 3 9}`.
-<dl>
-  <dt><code>list</code></dt>
-  <dd>The list to process.</dd>
-</dl>
-<br/>
-
-### lremove
-
-```Tcl
-pw::listutils lremove <listvarname> <value> ?<options>?
-```
-Removes the requested value from the list. Returns nothing.
-
-For example, `set lst {a b c d e} ; lremove lst c -sorted` sets `$lst` equal
-to `{a b d e}`.
-<dl>
-  <dt><code>listvarname</code></dt>
-  <dd>The list to process.</dd>
-  <dt><code>value</code></dt>
-  <dd>The value to remove from the list.</dd>
-  <dt><code>options</code></dt>
-  <dd>Any options supported by `lsearch <options> $lst $value`.</dd>
-</dl>
-<br/>
-
-### lstitch
-
-```Tcl
-pw::listutils lstitch <list1> ?<list2>? ?<repeat>?
-```
-Returns a single list comprised of alternating values from the `list1` and
-`list2`. The returned list will be the same length as `list1` and can be used
-as a `dict`.
-
-For example, `lstitch {1 2 3 4} {a b c d}` returns `{1 a 2 b 3 c 4 d}`.
-<dl>
-  <dt><code>list1</code></dt>
-  <dd>The list of dict keys.</dd>
-  <dt><code>list2</code></dt>
-  <dd>The list of dict values.</dd>
-  <dt><code>repeat</code></dt>
-  <dd>If 1, `list2` will be repeated as needed to provide values for `list1`.
-  If 0, any unmatched keys will have a value of {}. The default is 0.</dd>
-</dl>
-<br/>
-
-### lshift
-
-```Tcl
-pw::listutils lshift <listvarname>
-```
-Removes the first item from list and returns it. The list is modifed by this
-proc. If the list is empty, {} is returned.
-
-For example, `set lst {1 2 3 4} ; lshift $lst` returns `1` and sets `$lst` equal
-to `{2 3 4}`.
-<dl>
-  <dt><code>listvarname</code></dt>
-  <dd>The list to process.</dd>
-</dl>
-<br/>
-
-
-
-### pw::listutils Library Usage Examples
-
-#### Example 1
-
-```Tcl
-    xxxx
+namespace eval integer {
+  variable rangeSignature_ {?Inf|minLimit ?Inf|maxLimit??}
+  
+  proc parseRange { range } {
+    set re {^(Inf|[+-]?\d+)(?: +(Inf|[+-]?\d+))?$}
+    set range [string trim $range]
+    if { 0 == [llength $range] } {
+      set min Inf
+      set max Inf
+    } elseif { ![regexp -nocase $re $range -> min max] ||
+        ![parseLimit min] || ![parseLimit max] } {
+      variable rangeSignature_
+      return -code error "Invalid range: '$range'. Should be '$rangeSignature_'"
+    }
+    set ret [dict create]
+    setLimit ret MIN $min
+    setLimit ret MAX $max
+    return $ret
+  }
+}
 ```
 
-[SetWiki]: http://en.wikipedia.org/wiki/Set_%28mathematics%29
 
--->
+##### validate
+```
+VTOR::validate { value limits }
+```
+Validates a value assigned to a parameter instance that uses this base type.
+Invoked by `$param = value`. Returns 1 if `value` is valid or 0 if invalid.
+REQUIRED.
+
+where,
+
+`value` - The value being assigned to a paramter instance.
+
+`limits` - The parsed representation of `range` returned by
+[VTOR::parseRange](#parseRange).
+
+example,
+```
+namespace eval integer {
+  proc validate { value limits } {
+    set ret 1
+    if { [dict exists $limits MIN] && $value < [dict get $limits MIN]} {
+      set ret 0
+    } elseif { [dict exists $limits MAX] && $value > [dict get $limits MAX]} {
+      set ret 0
+    }
+    return $ret
+  }
+}
+```
+
+##### registerAliases
+```
+VTOR::registerAliases { }
+```
+Creates one or more aliases for a base type. Invoked once by
+[Param basetype](#basetype). Returns nothing. OPTIONAL.
+
+example,
+```
+namespace eval integer {
+  proc registerAliases { } {
+    ::Param basetype int [namespace current]
+  }
+}
+```
