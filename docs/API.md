@@ -17,7 +17,7 @@ Provides the *Param* command ensemble.
   * [new](#new)
   * [typedef](#typedef)
 * [Parameter Object Commands](#parameter-object-commands)
-  * [=](#-setValue)
+  * [=](#-setvalue)
   * [setValue](#setvalue)
   * [getValue](#getvalue)
   * [getType](#gettype)
