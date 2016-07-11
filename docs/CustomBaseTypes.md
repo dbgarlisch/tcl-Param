@@ -1,8 +1,8 @@
 # Custom Base Types
 
 New base types can be added to the Param library. A new base type can be
-explicitly added by an application using the [basetype](#basetype) command
-or automatically added by creating a
+explicitly added by an application using the [Param basetype](API.md#basetype)
+command or automatically added by creating a
 [Base Type Definition File](#base-type-definition-file).
 
 Each base type uses a validator to implement its behavior.
@@ -69,12 +69,12 @@ parseRange proc. This string is primarily used for error reporting. REQUIRED.
 type. If 0, a typedef is not created. OPTIONAL (default 1).
 
 `VTOR::objectProto_` - Defines one or more base type specific variables or procs
-that are added to all Param instances of this base type. See [Param new](#new).
+that are added to all Param instances of this base type. See [Param new](API.md#new).
 These variables and procs extend a Param instance beyond its base procs and
 variables. See XXXX. OPTIONAL (default {}).
 
 `VTOR::staticProto_` - Defines one or more typedef specific variables or procs
-that are added to all typedefs of this base type. See [Param typedef](#typedef).
+that are added to all typedefs of this base type. See [Param typedef](API.md#typedef).
 These variables and procs extend a typedef beyond its base procs and
 variables. See XXXX. OPTIONAL (default {}).
 
@@ -85,7 +85,7 @@ variables. See XXXX. OPTIONAL (default {}).
 VTOR::parseRange { range }
 ```
 Parses the range value passed to a typedef that uses this base type. Invoked by
-[Param typedef](#typedef). Returns a parsed representation of `range`. If `range`
+[Param typedef](API.md#typedef). Returns a parsed representation of `range`. If `range`
 is invalid, a Tcl error should be triggered. REQUIRED.
 
 The returned value is never used outside of the validator. It is stored as-is and
@@ -96,7 +96,7 @@ possible.
 
 where,
 
-`range` - A range value passed to [Param typedef](#typedef).
+`range` - A range value passed to [Param typedef](API.md#typedef).
 
 example,
 ```
@@ -158,7 +158,7 @@ namespace eval integer {
 VTOR::registerAliases { }
 ```
 Creates one or more aliases for a base type. Invoked once by
-[Param basetype](#basetype). Returns nothing. OPTIONAL.
+[Param basetype](API.md#basetype). Returns nothing. OPTIONAL.
 
 example,
 ```
