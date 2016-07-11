@@ -286,24 +286,27 @@ integer id associated with the currently assigned enum token.
 
 New base types can be added to the Param library. A new base type can be
 explicitly added by an application using the [basetype](#basetype) command
-or automatically added by creating a base type definition file.
+or automatically added by creating a
+[Base Type Definition File](#base-type-definition-file).
 
 Each base type uses a validator to implement its behavior.
-See [Validators](#validators) for details.
+See [Validators](#validators).
 
 ### Base Type Definition File
 
 The Param library auto loads all base type definition files found in the `basetypes`
 subdirectory. Theses files use the `NAME?-VTOR?.basetype.tcl` naming convention. Where
 `NAME` is the base type's name and `VTOR` is the validator name used for this base
-type. If not provided, `VTOR` defaults to `NAME`. For example:
+type. If not provided, `VTOR` defaults to `NAME`. A base type definition file contains
+the named validator's implementation.
 
-* *real.basetype.tcl* defines
-  * A base type named *real*
-  * Using a validator named *real*
-* *real-vtor.basetype.tcl* defines
-  * A base type named *real*
-  * Using a validator named *vtor*
+For example, a base type definition file named:
+* *real.basetype.tcl*
+  * Defines a base type named *real*
+  * Implements a validator named *real*
+* *real-vtor.basetype.tcl*
+  * Defines a base type named *real*
+  * Implements a validator named *vtor*
 
 ### Validators
 
@@ -312,9 +315,8 @@ Param library. The validator namespace must be unique and must exist before the 
 to `Param basetype`.
 
 A validator implements the following variable and procs.
-
 ```tcl
-namespace eval NSPACE {
+namespace eval VTOR {
   variable rangeSignature_ {signature-pattern}                          ;# REQUIRED
   variable createTypedef_ 1                                             ;# OPTIONAL
   variable objectProto_ {commands added to objects of basetype}         ;# OPTIONAL
@@ -325,7 +327,120 @@ namespace eval NSPACE {
 }
 ```
 
+#### Validator Variables
 
+`rangeSignature_` - Provides the base type's human readable range signature
+pattern string. This should describe the range value expected by the validator's
+parseRange proc. This string is primarily used for error reporting. REQUIRED.
+
+`createTypedef_` - If 1, a typedef is created with the same name as the base
+type. If 0, a typedef is not created. OPTIONAL (default 1).
+
+`objectProto_` - Defines one or more base type specific variables or procs
+that are added to all Param instances of this base type. See [Param new](#new).
+These variables and procs extend a Param instance beyond its base procs and
+variables. See XXXX. OPTIONAL (default {}).
+
+`staticProto_` - Defines one or more typedef specific variables or procs
+that are added to all typedefs of this base type. See [Param typedef](#typedef).
+These variables and procs extend a typedef beyond its base procs and
+variables. See XXXX. OPTIONAL (default {}).
+
+#### Validator Commands
+
+##### parseRange
+
+Parses the range value passed to a typedef that uses this base type. Invoked by
+[Param typedef](#typedef). Returns a parsed representation of `range`. If `range`
+is invalid, a Tcl error should be triggered. REQUIRED.
+
+The returned value is never used outside of the validator. It is stored as-is and
+later passed in the `limits` argument of [validate](#validate). Since `parseRange`
+is only called once per typedef, it is more efficient to do all heavy processing
+here so that the more frequent calls to [validate](#validate) will be as fast as
+possible.
+
+usage,
+```Tcl
+parseRange { range }
+```
+where,
+
+`range` - A range value passed to [Param typedef](#typedef).
+
+example,
+```
+# for integer base type
+variable rangeSignature_ {?Inf|minLimit ?Inf|maxLimit??}
+
+proc parseRange { range } {
+  set re {^(Inf|[+-]?\d+)(?: +(Inf|[+-]?\d+))?$}
+  set range [string trim $range]
+  if { 0 == [llength $range] } {
+    set min Inf
+    set max Inf
+  } elseif { ![regexp -nocase $re $range -> min max] ||
+      ![parseLimit min] || ![parseLimit max] } {
+    variable rangeSignature_
+    return -code error "Invalid range: '$range'. Should be '$rangeSignature_'"
+  }
+  set ret [dict create]
+  setLimit ret MIN $min
+  setLimit ret MAX $max
+  return $ret
+}
+```
+
+
+##### validate
+
+Validates a value assigned to a parameter instance that uses this base type.
+Invoked by `$param = value`. Returns 1 if `value` is valid or 0 if invalid.
+REQUIRED.
+
+usage,
+```
+proc validate { value limits }
+```
+where,
+
+`value` - The value being assigned to a paramter instance.
+
+`limits` - The parsed representation of `range` returned by
+[parseRange](#parseRange).
+
+example,
+```
+# for integer base type
+proc validate { value limits } {
+  set ret 1
+  if { [dict exists $limits MIN] && $value < [dict get $limits MIN]} {
+    set ret 0
+  } elseif { [dict exists $limits MAX] && $value > [dict get $limits MAX]} {
+    set ret 0
+  }
+  return $ret
+}
+```
+
+
+##### registerAliases
+
+Creates one or more aliases for a base type. Invoked by
+[Param basetype](#basetype). Returns nothing. OPTIONAL.
+
+usage,
+```
+proc registerAliases { }
+```
+
+example,
+```
+# aliases for the intger base type
+proc registerAliases { } {
+  ::Param basetype int [namespace current]
+}
+```
 
 <!--
 
