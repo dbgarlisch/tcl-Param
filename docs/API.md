@@ -184,7 +184,7 @@ where,
 All parameter objects support the following commands. Additional commands may be added by a
 particular base type (see [VVTOR::objectProto_](#validator-variables)).
 
-### $param =
+### = (setValue)
 ```tcl
 $param = val
 ```
@@ -196,7 +196,7 @@ where,
 
 `val` - The value being assigned.
 
-### $param setValue
+### setValue
 ```tcl
 $param setValue val
 ```
@@ -207,19 +207,19 @@ where,
 
 `val` - The value being assigned.
 
-### $param getValue
+### getValue
 ```tcl
 $param getValue
 ```
 Returns the current parameter value.
 
-### $param getType
+### getType
 ```tcl
 $param getType
 ```
 Returns the paramter type as passed to [Param new](#new).
 
-### $param getLimits
+### getLimits
 ```tcl
 $param getLimits
 ```
@@ -227,13 +227,13 @@ Returns the parsed `range` value as returned by [VTOR::parseRange](#parseRange).
 The exact structure of this value is base type dependent and is typically not
 used or needed by an application except for debugging.
 
-### $param getRange
+### getRange
 ```tcl
 $param getRange
 ```
 Returns the unparsed `range` value passed to [Param typedef](#typedef).
 
-### $param dump
+### dump
 ```tcl
 $param dump
 ```
