@@ -13,8 +13,11 @@ See [Validators](#validators).
 * [Validators](#validators)
   * [Validator Variables](#validator-variables)
   * [Validator Commands](#validator-commands)
+    * parseRange
+    * validate
+    * registerAliases
 
-### Base Type Definition File
+## Base Type Definition File
 
 The Param library auto loads all base type definition files found in the `basetypes`
 subdirectory. A base type definition file contains the named validator's implementation.
@@ -36,7 +39,7 @@ For example, a base type definition file named:
   * Defines a base type named *real*
   * Implements a validator named *vtor*
 
-### Validators
+## Validators
 
 A validator is a Tcl namespace that provides one or more procs and variables used by the
 Param library. The validator namespace must be unique and must exist before the call
@@ -56,7 +59,7 @@ namespace eval VTOR {
 }
 ```
 
-#### Validator Variables
+### Validator Variables
 
 `VTOR::rangeSignature_` - Provides the base type's human readable range signature
 pattern string. This should describe the range value expected by the validator's
@@ -75,9 +78,9 @@ that are added to all typedefs of this base type. See [Param typedef](#typedef).
 These variables and procs extend a typedef beyond its base procs and
 variables. See XXXX. OPTIONAL (default {}).
 
-#### Validator Commands
+### Validator Commands
 
-##### parseRange
+#### parseRange
 ```Tcl
 VTOR::parseRange { range }
 ```
@@ -120,7 +123,7 @@ namespace eval integer {
 ```
 
 
-##### validate
+#### validate
 ```
 VTOR::validate { value limits }
 ```
@@ -150,7 +153,7 @@ namespace eval integer {
 }
 ```
 
-##### registerAliases
+#### registerAliases
 ```
 VTOR::registerAliases { }
 ```
