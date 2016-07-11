@@ -16,14 +16,19 @@ Provides the *Param* command ensemble.
   * [isTypedef](#param-istypedef)
   * [new](#param-new)
   * [typedef](#param-typedef)
-* [Parameter Object Commands](#parameter-object-commands)
-  * [=](#obj-)
-  * [setValue](#obj-setvalue)
-  * [getValue](#obj-getvalue)
-  * [getType](#obj-gettype)
-  * [getLimits](#obj-getlimits)
-  * [getRange](#obj-getrange)
-  * [dump](#obj-dump)
+* [Parameter Objects](#parameter-objects)
+  * [Parameter Object Variables](#parameter-object-variables)
+    * [$self_](#obj-self_)
+    * [$type_](#obj-type_)
+    * [$val_](#obj-val_)
+  * [Parameter Object Commands](#parameter-object-commands)
+    * [=](#obj-)
+    * [setValue](#obj-setvalue)
+    * [getValue](#obj-getvalue)
+    * [getType](#obj-gettype)
+    * [getLimits](#obj-getlimits)
+    * [getRange](#obj-getrange)
+    * [dump](#obj-dump)
 * [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
@@ -174,9 +179,26 @@ where,
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
 
 
+## Parameter Objects
+All parameter objects support the following variables and commands. Additional variables and
+commands may be added by a base type validator.
+See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VVTOR::objectProto_](CustomBaseTypes.md#validator-variables).
+
+## Parameter Object Variables
+These variables are managed by the parameter object. An typical application should not need
+to access these values directly.
+
+### $obj::self_
+The object's namespace name. The same value returned by [Param new](API.md#param-new).
+That is, ($obj == $obj::self_) is true.
+
+### $obj::type_
+The object's type name as passed to [Param new](API.md#param-new).
+
+### $obj::val_
+The object's current value as set by [$obj =](#obj-) or [$obj setValue](#obj-setvalue).
+
 ## Parameter Object Commands
-All parameter objects support the following commands. Additional commands may be added by a
-particular base type (see [VVTOR::objectProto_](CustomBaseTypes.md#validator-variables)).
 
 ### $obj =
 ```tcl
