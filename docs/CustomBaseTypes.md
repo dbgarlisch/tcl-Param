@@ -71,12 +71,12 @@ type. If 0, a typedef is not created. OPTIONAL (default 1).
 `VTOR::objectProto_` - Defines one or more base type specific variables or procs
 that are added to all Param instances of this base type. See [Param new](API.md#param-new).
 These variables and procs extend a Param instance beyond its base procs and
-variables. See [builtin base types](BuiltInBaseTypes.md). OPTIONAL (default {}).
+variables. See [builtin base type object commands](BuiltInBaseTypes.md). OPTIONAL (default {}).
 
 `VTOR::staticProto_` - Defines one or more typedef specific variables or procs
 that are added to all typedefs of this base type. See [Param typedef](API.md#param-typedef).
 These variables and procs extend a typedef beyond its base procs and
-variables. See [builtin base types](BuiltInBaseTypes.md). OPTIONAL (default {}).
+variables. See [builtin base type typedef commands](BuiltInBaseTypes.md). OPTIONAL (default {}).
 
 ### Validator Commands
 
