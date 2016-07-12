@@ -182,7 +182,7 @@ where,
 ## Parameter Objects
 All parameter objects support the following variables and commands. Additional variables and
 commands may be added by a base type validator.
-See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VVTOR::objectProto_](CustomBaseTypes.md#validator-variables).
+See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VTOR::objectProto_](CustomBaseTypes.md#validator-variables).
 
 ## Parameter Object Variables
 These variables are managed by the parameter object. An typical application should not need
