@@ -67,4 +67,12 @@ namespace eval string {
     #vputs "### [namespace current]::registerAliases"
     ::Param basetype text [namespace current]
   }
+
+  # typedef object commands
+  variable objectProto_ {
+    public proc += { txt } {
+      variable self_
+      return [$self_ setValue "[$self_ getValue]$txt"]
+    }
+  }
 }

@@ -364,6 +364,8 @@ proc ::Param::unitTest {} {
   $bigStr dump
   $bigStr setValue "big12"
   $bigStr dump
+  $bigStr += "AB"
+  $bigStr dump
 
   puts {}
   set bigStr [Param new BigStrG "BigStrG"]
@@ -372,7 +374,7 @@ proc ::Param::unitTest {} {
   $bigStr dump
   $bigStr setValue "Big12"
   $bigStr dump
-  $bigStr setValue "Big123"
+  $bigStr += " B"
   $bigStr dump
 
   puts {}
