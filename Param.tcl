@@ -308,11 +308,27 @@ proc ::Param::unitTest {} {
   $poi dump
   puts "poi =: [$poi = 99]"
   puts "poi setValue: [$poi setValue 88]"
+  $poi += 2 ;# 90
+  $poi dump
+  $poi -= 2 ;# 88
+  $poi dump
+  $poi /= 2 ;# 44
+  $poi dump
+  $poi *= 2 ;# 88
+  $poi dump
 
   puts {}
   set pod [Param new double 33.33]
   $pod dump
-  $pod = 77.77
+  $pod = 12.50
+  $pod dump
+  $pod += 3.5 ;# 16.0
+  $pod dump
+  $pod -= 3.5 ;# 12.5
+  $pod dump
+  $pod /= 2 ;# 6.25
+  $pod dump
+  $pod *= 2 ;# 12.5
   $pod dump
 
   puts {}
@@ -320,11 +336,21 @@ proc ::Param::unitTest {} {
   $pod dump
   $pod = 66.88
   $pod dump
+  $pod += 3.1 ;# 69.98
+  $pod dump
+  $pod -= 3.1 ;# 66.88
+  $pod dump
+  $pod /= 2 ;# 33.44
+  $pod dump
+  $pod *= 2 ;# 66.88
+  $pod dump
 
   puts {}
-  set pos [Param new string {string 33}]
+  set pos [Param new string {hello world!}]
   $pos dump
-  $pos = {string 77}
+  $pos = hello
+  $pos dump
+  $pos += { world!}
   $pos dump
 
   puts {}

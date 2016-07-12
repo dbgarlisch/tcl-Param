@@ -64,4 +64,24 @@ namespace eval integer {
     #vputs "### [namespace current]::registerAliases"
     ::Param basetype int [namespace current]
   }
+
+  # typedef object commands
+  variable objectProto_ {
+    public proc += { val } {
+      variable self_
+      return [$self_ setValue [expr {[$self_ getValue] + $val}]]
+    }
+    public proc -= { val } {
+      variable self_
+      return [$self_ setValue [expr {[$self_ getValue] - $val}]]
+    }
+    public proc *= { val } {
+      variable self_
+      return [$self_ setValue [expr {[$self_ getValue] * $val}]]
+    }
+    public proc /= { val } {
+      variable self_
+      return [$self_ setValue [expr {[$self_ getValue] / $val}]]
+    }
+  }
 }
