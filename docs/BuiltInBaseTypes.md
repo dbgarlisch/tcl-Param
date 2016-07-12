@@ -41,6 +41,47 @@ empty, `{Inf Inf}` is used.
 
 ### Object Commands
 
+#### $obj +=
+```Tcl
+$obj += val
+```
+Increments parameter by val.
+
+where,
+
+`val` - The increment.
+
+#### $obj -=
+```Tcl
+$obj -= val
+```
+Decrements parameter by val.
+
+where,
+
+`val` - The decrement.
+
+#### $obj *=
+```Tcl
+$obj *= val
+```
+Multiply parameter by val.
+
+where,
+
+`val` - The multiplier.
+
+#### $obj /=
+```Tcl
+$obj /= val
+```
+Divide parameter by val.
+
+where,
+
+`val` - The divisor.
+
+
 ## integer
 ### Range
 ```
@@ -57,6 +98,47 @@ unlimited value. If the range is empty, `{Inf Inf}` is used.
 | {}        | Inf <= value <= Inf  |
 
 ### Object Commands
+
+#### $obj +=
+```Tcl
+$obj += val
+```
+Increments parameter by val.
+
+where,
+
+`val` - The increment.
+
+#### $obj -=
+```Tcl
+$obj -= val
+```
+Decrements parameter by val.
+
+where,
+
+`val` - The decrement.
+
+#### $obj *=
+```Tcl
+$obj *= val
+```
+Multiply parameter by val.
+
+where,
+
+`val` - The multiplier.
+
+#### $obj /=
+```Tcl
+$obj /= val
+```
+Divide parameter by val.
+
+where,
+
+`val` - The divisor.
+
 
 ## string
 ### Range
@@ -85,6 +167,16 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
 
 ### Object Commands
+
+#### $obj +=
+```Tcl
+$obj += val
+```
+Appends val to the string.
+
+where,
+
+`val` - The appendage.
 
 ## enum
 ### Range
@@ -115,3 +207,9 @@ integer id associated with the currently assigned enum token.
 | {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
 
 ### Object Commands
+
+#### $obj getId
+```Tcl
+$obj getId
+```
+Returns the enum's current id value.
