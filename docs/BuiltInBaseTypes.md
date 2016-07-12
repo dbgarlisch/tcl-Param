@@ -14,15 +14,16 @@ Several base type aliases are also defined.
 | `string`  | `text`          |
 
 ### Table of Contents
-* [double range](#double)
-* [integer range](#integer)
-* [string range](#string)
-* [enum range](#enum)
+* [double](#double)
+* [integer](#integer)
+* [string](#string)
+* [enum](#enum)
 
 ## double
-
-Range: `?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??`
-
+### Range
+```
+?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??
+```
 A `double` value supports a `minLimit`, `maxLimit` range. You can control the
 value comparison with an optional prefix. The `minLimit` value supports the
 *=* (value >= `minLimit`) and *>* (value > `minLimit`) prefixes. The `maxLimit` value
@@ -38,10 +39,13 @@ empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0.0 <= value <= Inf  |
 | {}        | Inf <= value <= Inf  |
 
+### Object Commands
+
 ## integer
-
-Range: `?Inf|minLimit ?Inf|maxLimit??`
-
+### Range
+```
+?Inf|minLimit ?Inf|maxLimit??
+```
 An `integer` value supports a `minLimit`, `maxLimit` range. Use *Inf* for an
 unlimited value. If the range is empty, `{Inf Inf}` is used.
 
@@ -52,10 +56,13 @@ unlimited value. If the range is empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0 <= value <= Inf    |
 | {}        | Inf <= value <= Inf  |
 
+### Object Commands
+
 ## string
-
-Range: `?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???`
-
+### Range
+```
+?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???
+```
 A `string` value supports a `pattern` match and `minLen`, `maxLen` range.
 
 The `g` prefix specifies a Tcl *glob* comparison.
@@ -77,9 +84,13 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | {r/^big.*$/it 4 7} | regexp, nocase, trim, length 4 to 7 |
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
 
-## enum
+### Object Commands
 
-Range: `?|<CHAR>?token?=integer? ?|token?=integer??...`
+## enum
+### Range
+```
+?|<CHAR>?token?=integer? ?|token?=integer??...
+```
 
 An `enum` value supports a fixed list of token values. Each token has an
 asociated integer id. The valid tokens are defined by a delimited list of
@@ -102,3 +113,5 @@ integer id associated with the currently assigned enum token.
 | {red\|green\|blue\|alpha}   | {red=0\|green=1\|blue=2\|alpha=3} |
 | {red\|green\|blue\|alpha}   | {\|,red,green,blue,alpha}         |
 | {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
+
+### Object Commands
