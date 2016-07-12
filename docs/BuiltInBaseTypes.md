@@ -15,12 +15,21 @@ Several base type aliases are also defined.
 
 ### Table of Contents
 * [double](#double)
+  * [Double Range](#double-range)
+  * [Double Object Commands](#double-object-commands)
 * [integer](#integer)
+  * [Integer Range](#integer-range)
+  * [Integer Object Commands](#integer-object-commands)
 * [string](#string)
+  * [String Range](#string-range)
+  * [String Object Commands](#string-object-commands)
 * [enum](#enum)
+  * [Enum Range](#enum-range)
+  * [Enum Object Commands](#enum-object-commands)
+  * [Enum Typedef Commands](#enum-typedef-commands)
 
 ## double
-### Range
+### Double Range
 ```
 ?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??
 ```
@@ -39,7 +48,7 @@ empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0.0 <= value <= Inf  |
 | {}        | Inf <= value <= Inf  |
 
-### Object Commands
+### Double Object Commands
 
 #### $obj +=
 ```Tcl
@@ -83,7 +92,7 @@ where,
 
 
 ## integer
-### Range
+### Integer Range
 ```
 ?Inf|minLimit ?Inf|maxLimit??
 ```
@@ -97,7 +106,7 @@ unlimited value. If the range is empty, `{Inf Inf}` is used.
 | {0 Inf}   | 0 <= value <= Inf    |
 | {}        | Inf <= value <= Inf  |
 
-### Object Commands
+### Integer Object Commands
 
 #### $obj +=
 ```Tcl
@@ -141,7 +150,7 @@ where,
 
 
 ## string
-### Range
+### String Range
 ```
 ?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???
 ```
@@ -166,7 +175,7 @@ If `maxLen` is specified, the value length must be <= `maxLen`.
 | {r/^big.*$/it 4 7} | regexp, nocase, trim, length 4 to 7 |
 | {g/big*/it 4 7}    | glob, nocase, trim, length 4 to 7   |
 
-### Object Commands
+### String Object Commands
 
 #### $obj +=
 ```Tcl
@@ -179,7 +188,7 @@ where,
 `val` - The appendage.
 
 ## enum
-### Range
+### Enum Range
 ```
 ?|<CHAR>?token?=integer? ?|token?=integer??...
 ```
@@ -206,10 +215,22 @@ integer id associated with the currently assigned enum token.
 | {red\|green\|blue\|alpha}   | {\|,red,green,blue,alpha}         |
 | {top=4\|bot\|left=8\|right} | {top=4\|bot=5\|left=8\|right=9}   |
 
-### Object Commands
+### Enum Object Commands
 
 #### $obj getId
 ```Tcl
 $obj getId
 ```
 Returns the enum's current id value.
+
+### Enum Typedef Commands
+
+#### $obj getTokenId token
+```Tcl
+$obj getId
+```
+Returns the token's associated id value.
+
+where,
+
+`token` - The enum token string.
