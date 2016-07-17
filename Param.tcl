@@ -4,41 +4,6 @@ source [file join [file dirname [info script]] .. tcl-Utils Debug.tcl]
 source [file join [file dirname [info script]] .. tcl-Utils ProcAccess.tcl]
 
 
-# optionlist ?valspec ?valspec?... ?default defval? ?usage text? ?
-#
-# where,
-#
-#   optionlist
-#     List of option aliases. Example, {-l --long}
-#
-#   valspec
-#     list of option argument value specs of the form:
-#       valtype?*count??:range?
-#
-#   valtype
-#     Value validation type. One of: int, real, string, file, dir, enum. You
-#     can register custom value validation types using the "CLArgs vtype"
-#     command.
-#
-#   range
-#     The valid, valtype-dependent value range:
-#       int    = min,max
-#       float  = min,max
-#       string = pattern
-#       file   = absolute or relative file name.
-#       dir    = absolute or relative file name.
-#       enum   = delimited list of valid tokens.
-#
-#   count
-#     The number of values expected after the option. May be a single value to
-#     specify an exact count (e.g. 3), or two dash-delimited values to specify
-#     a min-max count (e.g. 3-5), or a comma-delimited list of explicit or
-#     min-max counts (e.g. 1,3,5-8; same as 1,3,5,6,7,8).
-#
-# Examples,
-#
-#
-
 namespace eval ::Param {
   variable basetypes_ {}
   variable typedefs_ {}
@@ -78,6 +43,7 @@ namespace eval ::Param {
     }
   }
 
+
   public proc typedef { basetype name {range {}} {replace 0} } {
     if { ![isBasetype $basetype] } {
       return -code error "Invalid typedef basetype '$name'"
@@ -110,6 +76,7 @@ namespace eval ::Param {
     }
   }
 
+
   public proc new { type {val @@NULL@@} } {
     variable basetypes_
     variable typedefs_
@@ -140,25 +107,30 @@ namespace eval ::Param {
     return $ret
   }
 
+
   public proc isBasetype { name } {
     variable basetypes_
     return [dict exists $basetypes_ $name]
   }
+
 
   public proc getBasetype { typedefName } {
     variable typedefs_
     return [dict get $typedefs_ $typedefName BaseType]
   }
 
+
   public proc getBasetypes { } {
     variable basetypes_
     return [dict keys $basetypes_]
   }
 
+
   public proc getTypedefs { } {
     variable typedefs_
     return [dict keys $typedefs_]
   }
+
 
   public proc getValidator { type } {
     if { [isTypedef $type] } {
@@ -168,6 +140,7 @@ namespace eval ::Param {
     return [dict get $basetypes_ $type]
   }
 
+
   public proc getLimits { type } {
     if { ![isTypedef $type] } {
       return -code error "Unknown Param type '$type' must be one of [dict keys $typedefs_]"
@@ -175,6 +148,7 @@ namespace eval ::Param {
     variable typedefs_
     return [dict get $typedefs_ $type Limits]
   }
+
 
   public proc getRange { type } {
     if { ![isTypedef $type] } {
@@ -184,14 +158,17 @@ namespace eval ::Param {
     return [dict get $typedefs_ $type Range]
   }
 
+
   public proc getRangeSignature { type } {
     return [set [getValidator $type]::rangeSignature_]
   }
+
 
   public proc isTypedef { name } {
     variable typedefs_
     return [dict exists $typedefs_ $name]
   }
+
 
   # namespace for BUILTIN validators
   namespace eval VTOR {
@@ -226,6 +203,7 @@ namespace eval ::Param {
     }
   }
 
+
   private proc dump { title } {
     variable basetypes_
     variable typedefs_
@@ -236,17 +214,25 @@ namespace eval ::Param {
     puts "\}"
   }
 
+
+  private proc notifyRangeError { obj val } {
+    return 0 ;# not handled
+  }
+
+
+  # standard param object commands
   variable paramProto_ {
     variable self_ {}
     variable type_ {}
     variable val_ {}
 
     public proc = { val } {
+      variable self_
       variable type_
       if { [[::Param getValidator $type_]::validate $val [::Param getLimits $type_]] } {
         variable val_
         set val_ $val
-      } else {
+      } elseif { ![::Param notifyRangeError $self_ $val] } {
         return -code error "Value [list $val] not in range [list [::Param getRange $type_]]"
       }
     }
