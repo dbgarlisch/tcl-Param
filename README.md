@@ -34,6 +34,4 @@ Declare and initialize the application's data values.
   $scale = 10.50001 ;# error - out of range
 ```
 
-See the [tcl-Param API Docs][API] for full library documentation.
-
-[API]: docs/API.md
+See the [tcl-Param API Docs](docs/API.md) for full library documentation.
