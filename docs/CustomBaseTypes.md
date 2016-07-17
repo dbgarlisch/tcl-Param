@@ -7,7 +7,7 @@ command or automatically added by creating a
 
 [Validators](#validators) are used to implement a base type's behavior.
 
-See also [tcl-Param API Docs](docs/API.md) and [BuiltIn Base Types](BuiltInBaseTypes.md).
+See also [tcl-Param API Docs](API.md) and [BuiltIn Base Types](BuiltInBaseTypes.md).
 
 
 ### Table of Contents
