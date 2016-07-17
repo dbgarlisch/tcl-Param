@@ -13,6 +13,8 @@ Several base type aliases are also defined.
 | `integer` | `int`           |
 | `string`  | `text`          |
 
+See also See the [tcl-Param API Docs](API.md) for full library documentation.
+
 ### Table of Contents
 * [double](#double)
   * [Double Range](#double-range)
