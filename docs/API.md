@@ -47,6 +47,9 @@ Where,
 
 `options` - The cmd dependent options.
 
+See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [Custom Base Types](CustomBaseTypes.md).
+
+
 ### Param basetype
 ```Tcl
 Param basetype name ?vtorNamespace? ?replace?
