@@ -5,8 +5,10 @@ explicitly added by an application using the [Param basetype](API.md#param-baset
 command or automatically added by creating a
 [Base Type Definition File](#base-type-definition-file).
 
-Each base type uses a validator to implement its behavior.
-See [Validators](#validators).
+[Validators](#validators) are used to implement a base type's behavior.
+
+See also [tcl-Param API Docs](docs/API.md) and [BuiltIn Base Types](BuiltInBaseTypes.md).
+
 
 ### Table of Contents
 * [Base Type Definition File](#base-type-definition-file)
