@@ -185,8 +185,7 @@ commands may be added by a base type validator.
 See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VTOR::objectProto_](CustomBaseTypes.md#validator-variables).
 
 ## Parameter Object Variables
-These variables are managed by the parameter object. An typical application should not need
-to access these values directly.
+These variables are managed by the parameter object. A typical application should not access these values directly. However, these values will often be directly accessed by [validators](CustomBaseTypes.md#validators).
 
 ### $obj::self_
 The object's namespace name. The same value returned by [Param new](API.md#param-new).
