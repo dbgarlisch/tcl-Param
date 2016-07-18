@@ -9,6 +9,7 @@ Provides the *Param* command ensemble.
   * [getBasetypes](#param-getbasetypes)
   * [getLimits](#param-getlimits)
   * [getRange](#param-getrange)
+  * [getRangeErrorCmd](#param-getrangeerrorcmd)
   * [getRangeSignature](#param-getrangesignature)
   * [getTypedefs](#param-gettypedefs)
   * [getValidator](#param-getvalidator)
@@ -16,6 +17,7 @@ Provides the *Param* command ensemble.
   * [isTypedef](#param-istypedef)
   * [new](#param-new)
   * [typedef](#param-typedef)
+  * [setRangeErrorCmd](#param-setrangeerrorcmd)
 * [Parameter Objects](#parameter-objects)
   * [Parameter Object Variables](#parameter-object-variables)
     * [$self_](#objself_)
@@ -23,12 +25,15 @@ Provides the *Param* command ensemble.
     * [$val_](#objval_)
   * [Parameter Object Commands](#parameter-object-commands)
     * [=](#obj-)
-    * [setValue](#obj-setvalue)
-    * [getValue](#obj-getvalue)
-    * [getType](#obj-gettype)
+    * [dump](#obj-dump)
     * [getLimits](#obj-getlimits)
     * [getRange](#obj-getrange)
-    * [dump](#obj-dump)
+    * [getRangeErrorCmd](#obj-getrangeerrorcmd)
+    * [getType](#obj-gettype)
+    * [getValue](#obj-getvalue)
+    * [setRangeErrorCmd](#obj-setrangeerrorcmd)
+    * [setValue](#obj-setvalue)
+* [Range Error Commands](#range-error-commands)
 * [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
@@ -101,6 +106,12 @@ where,
 
 `type` - Is a type definition or base type name.
 
+### Param getRangeErrorCmd
+```tcl
+Param getRangeErrorCmd
+```
+Gets the current range error command.
+
 ### Param getRangeSignature
 ```tcl
 Param getRangeSignature type
@@ -159,6 +170,17 @@ where,
 
 `val` - The optional, initial parameter value. The default is type dependent.
 
+### Param setRangeErrorCmd
+```tcl
+Param setRangeErrorCmd cmd
+```
+Sets the command to be invoked when an assignment violates a parameter's range.
+See also [Range Error Commands](#range-error-commands). Returns the previous command.
+
+where,
+
+`cmd` - The command to invoke as [{*}$cmd $obj valueVarName].
+
 ### Param typedef
 ```tcl
 Param typedef basetype name ?range? ?replace?
@@ -214,28 +236,14 @@ where,
 
 `val` - The value being assigned.
 
-### $obj setValue
+### $obj dump
 ```tcl
-$obj setValue val
+$obj dump
 ```
-Assignes a new value to the parameter. An error is triggered if the value
-violates the associated range. Returns the assigned value.
-
-where,
-
-`val` - The value being assigned.
-
-### $obj getValue
-```tcl
-$obj getValue
+Returns a text representation of the parameter as
 ```
-Returns the current parameter value.
-
-### $obj getType
-```tcl
-$obj getType
+"${self_}: type($type_) value($val_)".
 ```
-Returns the paramter type as passed to [Param new](#param-new).
 
 ### $obj getLimits
 ```tcl
@@ -251,14 +259,51 @@ $obj getRange
 ```
 Returns the unparsed `range` value passed to [Param typedef](#param-typedef).
 
-### $obj dump
+### $obj getRangeErrorCmd
 ```tcl
-$obj dump
+$obj getRangeErrorCmd
 ```
-Returns a text representation of the parameter as
+Gets the current range error command.
+
+### $obj getType
+```tcl
+$obj getType
 ```
-"${self_}: type($type_) value($val_)".
+Returns the paramter type as passed to [Param new](#param-new).
+
+### $obj getValue
+```tcl
+$obj getValue
 ```
+Returns the current parameter value.
+
+### $obj setRangeErrorCmd
+```tcl
+$obj setRangeErrorCmd cmd
+```
+Sets the command to be invoked when an assignment violates this parameter's range.
+See also [Range Error Commands](#range-error-commands). Returns the previous command.
+
+where,
+
+`cmd` - The command to invoke as [{*}$cmd $obj valueVarName].
+
+### $obj setValue
+```tcl
+$obj setValue val
+```
+Assignes a new value to the parameter. An error is triggered if the value
+violates the associated range. Returns the assigned value.
+
+where,
+
+`val` - The value being assigned.
+
+## Range Error Commands
+When an assignment violates a parameter's range. A series of commands are attempted.
+* The command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
+* The command set by [::Param::TYPEDEFNAME setRangeErrorCmd](#param-setrangeerrorcmd)
+* The command set by [$obj setRangeErrorCmd](#param-setrangeerrorcmd)
 
 ## Usage Examples
 
