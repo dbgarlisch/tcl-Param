@@ -300,10 +300,10 @@ where,
 `val` - The value being assigned.
 
 ## Range Error Commands
-When an assignment violates a parameter's range. A series of commands are attempted.
-* The command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
-* The command set by [::Param::TYPEDEFNAME setRangeErrorCmd](#param-setrangeerrorcmd)
-* The command set by [$obj setRangeErrorCmd](#param-setrangeerrorcmd)
+When an assignment violates a parameter's range, a series of commands are attempted.
+* The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
+* The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
+* The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
 
 ## Usage Examples
 
