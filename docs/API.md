@@ -179,7 +179,7 @@ See also [Range Error Commands](#range-error-commands). Returns the previous com
 
 where,
 
-`cmd` - The command to invoke as [{*}$cmd $obj valueVarName].
+`cmd` - The command to invoke.
 
 ### Param typedef
 ```tcl
@@ -286,7 +286,7 @@ See also [Range Error Commands](#range-error-commands). Returns the previous com
 
 where,
 
-`cmd` - The command to invoke as [{*}$cmd $obj valueVarName].
+`cmd` - The command to invoke.
 
 ### $obj setValue
 ```tcl
@@ -300,10 +300,20 @@ where,
 `val` - The value being assigned.
 
 ## Range Error Commands
-When an assignment violates a parameter's range, a series of commands are attempted.
+When an assignment violates a parameter's range, a series of commands are attempted in turn.
 * The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
 * The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
 * The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
+
+The command is invoked as `[{*}$cmd $obj valueVarName]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVarName` arguments are always last.
+
+where,
+
+`$obj` - The parameter object, returned from [Param new](#param-new), that was assigned the invalid value.
+
+`valueVarName` - The name of variable containing the invalid value. Use `upvar` to gain read/write access to this var.
+
+A command should return 1 to stop the command sequence. It should return 0 to continue the command sequence. 
 
 ## Usage Examples
 
