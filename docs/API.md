@@ -313,7 +313,7 @@ where,
 
 `valueVarName` - The name of variable containing the invalid value. Use `upvar` to gain read/write access to this var.
 
-A command should return 1 to stop the command sequence. It should return 0 to continue the command sequence. 
+A command should return 1 to stop the command sequence and have the value revalidated. It should return 0 to continue the command sequence. 
 
 ## Usage Examples
 
