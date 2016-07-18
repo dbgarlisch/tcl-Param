@@ -39,7 +39,8 @@ namespace eval string {
     return $ret
   }
 
-  proc validate { value limits } {
+  proc validate { valueVar limits } {
+    upvar $valueVar value
     #vputs "### [namespace current]::validate $value [list $limits]"
     set ret 1
     if { [dict exists $limits PATTERN] } {

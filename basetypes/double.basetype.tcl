@@ -71,10 +71,23 @@ namespace eval double {
     }
   }
 
-  proc validate { value limits } {
+  proc validate { valueVar limits } {
+    upvar $valueVar value
     #vputs "### [namespace current]::validate $value [list $limits]"
     set ret 1
-    if { [dict exists $limits MIN] } {
+    if { [string is double -strict $value] } {
+      # all good
+    } elseif { [catch {expr $value} result] } {
+      # value was NOT a valid expression
+      set ret 0
+    } elseif { ![string is double -strict $result] } {
+      # $result is NOT a double value
+      set ret 0
+    } else {
+      # value WAS a valid double expression. use it.
+      set value $result
+    }
+    if { $ret && [dict exists $limits MIN] } {
       set ret [expr [list $value [dict get $limits MINCMP] [dict get $limits MIN]]]
     }
     if { $ret && [dict exists $limits MAX] } {

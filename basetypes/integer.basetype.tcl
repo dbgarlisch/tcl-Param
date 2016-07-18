@@ -49,12 +49,26 @@ namespace eval integer {
     }
   }
 
-  proc validate { value limits } {
+  proc validate { valueVar limits } {
+    upvar $valueVar value
     #vputs "### [namespace current]::validate $value [list $limits]"
     set ret 1
-    if { [dict exists $limits MIN] && $value < [dict get $limits MIN]} {
+    if { [string is integer -strict $value] } {
+      # all good
+    } elseif { [catch {expr $value} result] } {
+      # value was NOT a valid expression
       set ret 0
-    } elseif { [dict exists $limits MAX] && $value > [dict get $limits MAX]} {
+    } elseif { ![string is integer -strict $result] } {
+      # $result is NOT a integer value
+      set ret 0
+    } else {
+      # value WAS a valid integer expression. use it.
+      set value $result
+    }
+    if { $ret && [dict exists $limits MIN] && $value < [dict get $limits MIN] } {
+      set ret 0
+    }
+    if { $ret && [dict exists $limits MAX] && $value > [dict get $limits MAX] } {
       set ret 0
     }
     return $ret

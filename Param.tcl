@@ -8,6 +8,7 @@ namespace eval ::Param {
   variable basetypes_ {}
   variable typedefs_ {}
   variable cnt_ 0
+  variable rangeErrorCmd_ {}
 
   namespace import ::Debug::vputs ::Debug::verboseDo ::Debug::dumpDict
 
@@ -61,19 +62,21 @@ namespace eval ::Param {
     dict set typedefs_ $name Limits [${vtorNamespace}::parseRange $range]
     dict set typedefs_ $name Range $range
 
-    if { "" == "[info vars ${vtorNamespace}::staticProto_]" } {
-      # do nothing
-    } elseif { [namespace exists ::$name] } {
+    if { [namespace exists ::Param::$name] } {
       return -code error "Typedef namespace collision '$name'"
-    } else {
-      #vputs "${vtorNamespace}::staticProto_ =\n[set ${vtorNamespace}::staticProto_]"
-      namespace eval ::$name [set ${vtorNamespace}::staticProto_]
-      namespace eval ::$name {
-        variable self_ {}
-        namespace ensemble create
-      }
-      set ::${name}::self_ $name
     }
+    # build typedef's ensemble
+    variable typedefProto_
+    namespace eval ::Param::$name $typedefProto_
+    set ::Param::${name}::self_ $name
+    if { "" != "[info vars ${vtorNamespace}::staticProto_]" } {
+      # validator wants to modify the typedef ensemble
+      namespace eval ::Param::$name [set ${vtorNamespace}::staticProto_]
+    }
+    namespace eval ::Param::$name {
+      namespace ensemble create
+    }
+    return $name
   }
 
 
@@ -164,6 +167,20 @@ namespace eval ::Param {
   }
 
 
+  public proc setRangeErrorCmd { cb } {
+    variable rangeErrorCmd_
+    set oldCB $rangeErrorCmd_
+    set rangeErrorCmd_ $cb
+    return $oldCB
+  }
+
+
+  public proc getRangeErrorCmd { } {
+    variable rangeErrorCmd_
+    return $rangeErrorCmd_
+  }
+
+
   public proc isTypedef { name } {
     variable typedefs_
     return [dict exists $typedefs_ $name]
@@ -215,30 +232,93 @@ namespace eval ::Param {
   }
 
 
-  private proc notifyRangeError { obj val } {
-    return 0 ;# not handled
+  private proc notifyRangeError { obj valVar } {
+    upvar $valVar val
+    variable rangeErrorCmd_
+    # Give Param first dibs
+    set ret [invokeRangeErrorCmd $rangeErrorCmd_ $obj val]
+    if { !$ret } {
+      # Not handled by Param. Give the $obj's typedef namespace a chance
+      set ret [::Param::[$obj getType]::notifyRangeError $obj val]
+    }
+    if { !$ret } {
+      # Not handled by Param or typedef. Give $obj a chance
+      set ret [${obj}::notifyRangeError val]
+    }
+    return $ret ;# 0 means not handled
   }
 
+
+  private proc invokeRangeErrorCmd { cb obj valVar } {
+    upvar $valVar val
+    set ret 0
+    if { "" != "$cb" } {
+      #puts "### invokeRangeErrorCmd '$cb' '$obj' '$val'"
+      set ret [{*}$cb $obj val]
+    }
+    return $ret
+  }
+
+
+  # standard typedef static commands
+  variable typedefProto_ {
+    variable self_ {}
+    variable rangeErrorCmd_ {}
+
+    public proc setRangeErrorCmd { cb } {
+      variable rangeErrorCmd_
+      set oldCB $rangeErrorCmd_
+      set rangeErrorCmd_ $cb
+      return $oldCB
+    }
+
+    public proc getRangeErrorCmd { } {
+      variable rangeErrorCmd_
+      return $rangeErrorCmd_
+    }
+
+    private proc notifyRangeError { obj valVar } {
+      upvar $valVar val
+      variable rangeErrorCmd_
+      return [::Param::invokeRangeErrorCmd $rangeErrorCmd_ $obj val]
+    }
+  }
 
   # standard param object commands
   variable paramProto_ {
     variable self_ {}
     variable type_ {}
     variable val_ {}
+    variable rangeErrorCmd_ {}
 
-    public proc = { val } {
+    public proc = { args } {
       variable self_
       variable type_
-      if { [[::Param getValidator $type_]::validate $val [::Param getLimits $type_]] } {
-        variable val_
-        set val_ $val
-      } elseif { ![::Param notifyRangeError $self_ $val] } {
-        return -code error "Value [list $val] not in range [list [::Param getRange $type_]]"
+      variable val_
+      if { 1 == [llength $args] } {
+        set val [lindex $args 0]
+      } else {
+        set val "$args"
       }
+      if { [[::Param getValidator $type_]::validate val [::Param getLimits $type_]] } {
+        # val is good - use it
+        set val_ $val
+        return $val_
+      }
+      # give any range error handlers a chance
+      if { ![::Param::notifyRangeError $self_ val] } {
+        # range error handlers did NOT stop error - drop through
+      } elseif { [[::Param getValidator $type_]::validate val [::Param getLimits $type_]] } {
+        # A range error handler fixed val - use it
+        set val_ $val
+        return $val_
+      }
+      # invalid val
+      return -code error "Value [list $val] not in range [list [::Param getRange $type_]]"
     }
 
-    public proc setValue { val } {
-      = $val
+    public proc setValue { args } {
+      = {*}$args
     }
 
     public proc getValue { } {
@@ -261,153 +341,38 @@ namespace eval ::Param {
       return [::Param getRange $type_]
     }
 
-    public proc dump {} {
+    public proc toString {} {
       variable self_
       variable type_
       variable val_
-      puts "${self_}: type($type_) value($val_)"
+      return "${self_}: type($type_) value($val_)"
+    }
+
+    public proc dump {} {
+      variable self_
+      puts [$self_ toString]
+    }
+
+    public proc setRangeErrorCmd { cb } {
+      variable rangeErrorCmd_
+      set oldCB $rangeErrorCmd_
+      set rangeErrorCmd_ $cb
+      return $oldCB
+    }
+
+    public proc getRangeErrorCmd { } {
+      variable rangeErrorCmd_
+      return $rangeErrorCmd_
+    }
+
+    private proc notifyRangeError { valVar } {
+      upvar $valVar val
+      variable self_
+      variable rangeErrorCmd_
+      return [::Param::invokeRangeErrorCmd $rangeErrorCmd_ $self_ val]
     }
   }
 
   namespace ensemble create
 }
 Param::init
-
-
-proc ::Param::unitTest {} {
-  Param typedef integer iMonth {1 12}
-  Param typedef double Scale {>0 10}
-  Param typedef real ScaleReal {>1 10}
-  Param typedef float ScaleFloat {>2 10}
-  Param typedef string BigStrR {r/^big\S{1,4}$/it 4 7}
-  Param typedef string BigStrG {g/big*/it 4 7}
-  #namespace eval ::ColorComponent {}
-  #namespace delete ::ColorComponent
-  Param typedef enum ColorComponent {red|green|blue=5|alpha}
-  #Param typedef boolean Switched {on=1|off=0}
-  Param::dump "::Param::unitTest"
-
-  puts {}
-  set poi [Param new integer 33]
-  $poi dump
-  $poi = 77
-  $poi dump
-  puts "poi =: [$poi = 99]"
-  puts "poi setValue: [$poi setValue 88]"
-  $poi += 2 ;# 90
-  $poi dump
-  $poi -= 2 ;# 88
-  $poi dump
-  $poi /= 2 ;# 44
-  $poi dump
-  $poi *= 2 ;# 88
-  $poi dump
-
-  puts {}
-  set pod [Param new double 33.33]
-  $pod dump
-  $pod = 12.50
-  $pod dump
-  $pod += 3.5 ;# 16.0
-  $pod dump
-  $pod -= 3.5 ;# 12.5
-  $pod dump
-  $pod /= 2 ;# 6.25
-  $pod dump
-  $pod *= 2 ;# 12.5
-  $pod dump
-
-  puts {}
-  set pod [Param new real 44.55]
-  $pod dump
-  $pod = 66.88
-  $pod dump
-  $pod += 3.1 ;# 69.98
-  $pod dump
-  $pod -= 3.1 ;# 66.88
-  $pod dump
-  $pod /= 2 ;# 33.44
-  $pod dump
-  $pod *= 2 ;# 66.88
-  $pod dump
-
-  puts {}
-  set pos [Param new string {hello world!}]
-  $pos dump
-  $pos = hello
-  $pos dump
-  $pos += { world!}
-  $pos dump
-
-  puts {}
-  set imon [Param new iMonth 3]
-  $imon dump
-  $imon = 7
-  $imon dump
-
-  puts {}
-  set scale [Param new Scale 0.9]
-  $scale dump
-  $scale setValue .4
-  $scale dump
-  $scale = 10.0000
-  $scale dump
-
-  puts {}
-  set scale [Param new ScaleReal 1.1]
-  $scale dump
-  $scale setValue 1.4
-  $scale dump
-  $scale = 10.0000
-  $scale dump
-
-  puts {}
-  set scale [Param new ScaleFloat 2.1]
-  $scale dump
-  $scale setValue 2.4
-  $scale dump
-  $scale = 10.0000
-  $scale dump
-
-  puts {}
-  set bigStr [Param new BigStrR "BigStr"]
-  $bigStr dump
-  $bigStr setValue "Big1234"
-  $bigStr dump
-  $bigStr setValue "big12"
-  $bigStr dump
-  $bigStr += "AB"
-  $bigStr dump
-
-  puts {}
-  set bigStr [Param new BigStrG "BigStrG"]
-  $bigStr dump
-  $bigStr setValue "Big1234"
-  $bigStr dump
-  $bigStr setValue "Big12"
-  $bigStr dump
-  $bigStr += " B"
-  $bigStr dump
-
-  puts {}
-  set ccomp [Param new ColorComponent "red"]
-  $ccomp dump
-  puts "$ccomp id([$ccomp getId])"
-  $ccomp setValue "green"
-  $ccomp dump
-  puts "$ccomp id([$ccomp getId])"
-  $ccomp = "blue"
-  $ccomp dump
-  puts "$ccomp id([$ccomp getId])"
-  puts "ColorComponent getTokenId(alpha=[ColorComponent getTokenId alpha])"
-
-  set fmt "| %-15.15s | %-60.60s |"
-  set dashes [string repeat - 100]
-  puts {}
-  puts [format $fmt "Basetype" "Range Signature"]
-  puts [format $fmt $dashes $dashes]
-  foreach basetype [Param getBasetypes] {
-    puts [format $fmt $basetype [Param getRangeSignature $basetype]]
-  }
-}
-::Param::unitTest

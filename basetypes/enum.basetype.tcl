@@ -45,9 +45,21 @@ namespace eval enum {
     return $ret
   }
 
-  proc validate { value limits } {
+  proc validate { valueVar limits } {
+    upvar $valueVar value
+    set ret [dict exists $limits [string trim $value]]
+    if { !$ret && [string is integer -strict $value]} {
+      # get sub dict that has matching value(s)
+      set m [dict filter $limits value $value]
+      if { 0 != [dict size $m] } {
+        # found at least one {key val} pair, use key from first entry to
+        # change value being assigned
+        set value [lindex $m 0]
+        set ret 1
+      }
+    }
     #vputs "### [namespace current]::validate $value [list $limits]"
-    return [dict exists $limits [string trim $value]]
+    return $ret
   }
 
   proc registerAliases { } {
