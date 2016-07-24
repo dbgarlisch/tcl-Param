@@ -305,9 +305,9 @@ where,
 
 ## Range Error Commands
 When a requested assignment (see [$obj =](#obj-) and [$obj setValue](#obj-setvalue)) would violate a parameter's range, the new value is not immediately assigned to the parameter. Instead, a series of range error commands are attempted in turn as follows:
-1. The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
-2. The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
-3. The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
+* The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
+* The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
+* The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
 
 Each command is invoked as `[{*}$cmd $obj valueVar]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVar` arguments are always last.
 
