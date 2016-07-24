@@ -2,39 +2,17 @@ source [file join [file dirname [info script]] .. Param.tcl]
 source [file join [file dirname [info script]] .. .. tcl-Utils ProcAccess.tcl]
 source [file join [file dirname [info script]] .. .. tcl-Utils UnitTester.tcl]
 
-proc enumRangeErrObj { a0 obj varVar } {
-  upvar $varVar var
-  #puts "#### enumRangeErrObj '$a0' '$obj' '$var'"
-  if { "$var" == "OBJ" } {
-    return -code error "$a0-enumRangeErrObj"
-  }
-  return 0
-}
-
-proc enumRangeErrTypedef { a0 obj varVar } {
-  upvar $varVar var
-  #puts "#### enumRangeErrTypedef '$a0' '$obj' '$var'"
-  if { "$var" == "TYPEDEF" } {
-    return -code error "$a0-enumRangeErrTypedef"
-  }
-  return 0
-}
-
-proc enumRangeErrParam { a0 obj varVar } {
-  upvar $varVar var
-  #puts "#### enumRangeErrParam '$a0' '$obj' '$var'"
-  if { "$var" == "PARAM" } {
-    return -code error "$a0-enumRangeErrParam"
-  }
-  return 0
-}
-
 
 namespace eval ::Param::UnitTest {
   namespace import ::UnitTester::*
 
   variable rePatternParamObj_ {::Param::param_\d+}
-  variable errNotInRange      {r/Value.*not in range.*/}
+  variable errNotInRange_     {r/Value.*not in range.*/}
+  variable rngErrProcParam_   {::Param::notifyRangeError}
+  variable rngErrProcTDef_    {::Param::ColorComponent::notifyRangeError}
+  variable rngErrProcObj_     "r/${rePatternParamObj_}::notifyRangeError/"
+
+  variable rangeErrProc_      {}
 
 
   public proc run {} {
@@ -42,6 +20,10 @@ namespace eval ::Param::UnitTest {
     testDouble
     testString
     testEnum
+    testRangeErrorCmd
+    testRangeErrorCmdIgnore
+    testRangeErrorCmdForce
+    testRangeErrorCmdAgain
     Summary
 
     Param::dump "::Param::unitTest"
@@ -62,20 +44,20 @@ namespace eval ::Param::UnitTest {
   #========================================================================
 
   private proc testInteger {} {
-    doTestIntegerImpl integer
-    doTestIntegerImpl int
+    T_Integer integer
+    T_Integer int
   }
 
 
   private proc testDouble {} {
-    doTestDoubleImpl double
-    doTestDoubleImpl real
-    doTestDoubleImpl float
+    T_Double double
+    T_Double real
+    T_Double float
   }
 
 
   private proc testString {} {
-    variable errNotInRange
+    variable errNotInRange_
 
     H testString
     set initVal {hello world!}
@@ -94,7 +76,7 @@ namespace eval ::Param::UnitTest {
     T {$param setValue "Big1234"} "Big1234"
     T {$param setValue "big12"} "big12"
     T {$param += "AB"} "big12AB"
-    E {$param += " X"} $errNotInRange
+    E {$param += " X"} $errNotInRange_
     unset param
 
     set typeName BigStrGlob
@@ -106,13 +88,13 @@ namespace eval ::Param::UnitTest {
     T {$param setValue "Big1234"} "Big1234"
     T {$param setValue "big12"} "big12"
     T {$param += " B"} "big12 B"
-    E {$param += " B"} $errNotInRange
+    E {$param += " B"} $errNotInRange_
     unset param
   }
 
 
   private proc testEnum {} {
-    variable errNotInRange
+    variable errNotInRange_
 
     set typeName ColorComponent
     H "testEnum $typeName obj"
@@ -140,42 +122,135 @@ namespace eval ::Param::UnitTest {
     T {$param = 6} alpha
     T {$param getValue} alpha
     T {$param getId} 6
-    E {$param = yellow} $errNotInRange
-    E {$param = 3} $errNotInRange
+    E {$param = yellow} $errNotInRange_
+    E {$param = 3} $errNotInRange_
 
-    set rngErrCmdParam {::enumRangeErrParam X}
-    set rngErrCmdTDef {::enumRangeErrTypedef Y}
-    set rngErrCmdObj {::enumRangeErrObj Z}
-    H "testEnum RangeErrorCmd"
-    T {::Param setRangeErrorCmd $rngErrCmdParam} {}
-    T {::Param::ColorComponent setRangeErrorCmd $rngErrCmdTDef} {}
-    T {$param setRangeErrorCmd $rngErrCmdObj} {}
-
-    E {$param = PARAM} {X-enumRangeErrParam}
-    E {$param = TYPEDEF} {Y-enumRangeErrTypedef}
-    E {$param = OBJ} {Z-enumRangeErrObj}
-    E {$param = 33} $errNotInRange
-
-    T {::Param setRangeErrorCmd "${rngErrCmdParam}X"} $rngErrCmdParam
-    T {::Param::ColorComponent setRangeErrorCmd "${rngErrCmdTDef}Y"} $rngErrCmdTDef
-    T {$param setRangeErrorCmd "${rngErrCmdObj}Z"} $rngErrCmdObj
-    E {$param = PARAM} {XX-enumRangeErrParam}
-    E {$param = TYPEDEF} {YY-enumRangeErrTypedef}
-    E {$param = OBJ} {ZZ-enumRangeErrObj}
-    E {$param = 33} $errNotInRange
-
-    T {$param setRangeErrorCmd {}} "${rngErrCmdObj}Z"
-    T {::Param::ColorComponent setRangeErrorCmd {}} "${rngErrCmdTDef}Y"
-    T {::Param setRangeErrorCmd {}} "${rngErrCmdParam}X"
-    E {$param = OBJ} $errNotInRange
-    E {$param = TYPEDEF} $errNotInRange
-    E {$param = PARAM} $errNotInRange
-
-    H "testEnum $typeName typedef"
+    H "testEnum $typeName getTokenId"
     T {::Param::ColorComponent getTokenId red} 0
     T {::Param::ColorComponent getTokenId green} 1
     T {::Param::ColorComponent getTokenId blue} 5
     T {::Param::ColorComponent getTokenId alpha} 6
+  }
+
+
+  private proc testRangeErrorCmd {} {
+    variable errNotInRange_
+    variable rangeErrProc_
+    variable rePatternParamObj_
+    variable rngErrProcParam_
+    variable rngErrProcTDef_
+    variable rngErrProcObj_
+
+    set rngErrCmdParam {UnitTest::enumRangeErrParam X}
+    set rngErrCmdTDef {UnitTest::enumRangeErrTypedef Y}
+    set rngErrCmdObj {UnitTest::enumRangeErrObj Z}
+
+    set typeName ColorComponent
+    set initVal red
+    T_Param_New param $typeName $initVal
+    T_toString $param $typeName $initVal
+
+    H "testRangeErrorCmd X Y Z"
+    T {::Param setRangeErrorCmd $rngErrCmdParam} [::Param getRangeErrorCmd]
+    T {::Param::ColorComponent setRangeErrorCmd $rngErrCmdTDef} [::Param::ColorComponent getRangeErrorCmd]
+    T {$param setRangeErrorCmd $rngErrCmdObj} [$param getRangeErrorCmd]
+    E {$param = PARAM} {X-enumRangeErrParam}
+    T {set rangeErrProc_} $rngErrProcParam_
+    E {$param = TYPEDEF} {Y-enumRangeErrTypedef}
+    T {set rangeErrProc_} $rngErrProcTDef_
+    E {$param = OBJ} {Z-enumRangeErrObj}
+    T {set rangeErrProc_} $rngErrProcObj_
+    E {$param = 33} $errNotInRange_
+
+    H "testRangeErrorCmd XX YY ZZ"
+    T {::Param setRangeErrorCmd "${rngErrCmdParam}X"} [::Param getRangeErrorCmd]
+    T {::Param::ColorComponent setRangeErrorCmd "${rngErrCmdTDef}Y"} [::Param::ColorComponent getRangeErrorCmd]
+    T {$param setRangeErrorCmd "${rngErrCmdObj}Z"} [$param getRangeErrorCmd]
+    E {$param = PARAM} {XX-enumRangeErrParam}
+    T {set rangeErrProc_} $rngErrProcParam_
+    E {$param = TYPEDEF} {YY-enumRangeErrTypedef}
+    T {set rangeErrProc_} $rngErrProcTDef_
+    E {$param = OBJ} {ZZ-enumRangeErrObj}
+    T {set rangeErrProc_} $rngErrProcObj_
+    E {$param = 33} $errNotInRange_
+
+    H "testRangeErrorCmd Defaulted"
+    T {::Param setRangeErrorCmd {}} [::Param getRangeErrorCmd]
+    T {::Param::ColorComponent setRangeErrorCmd {}} [::Param::ColorComponent getRangeErrorCmd]
+    T {$param setRangeErrorCmd {}} [$param getRangeErrorCmd]
+    set rangeErrProc_ null
+    E {$param = PARAM} $errNotInRange_
+    T {set rangeErrProc_} null
+    E {$param = TYPEDEF} $errNotInRange_
+    T {set rangeErrProc_} null
+    E {$param = OBJ} $errNotInRange_
+    T {set rangeErrProc_} null
+  }
+
+
+  private proc testRangeErrorCmdIgnore {} {
+    variable rngErrProcParam_
+    variable rngErrProcTDef_
+    variable rngErrProcObj_
+
+    set typeName ColorComponent
+    set initVal green
+    T_Param_New param $typeName $initVal
+    T_toString $param $typeName $initVal
+
+    set expectedVals [dict create \
+      PARAM   $initVal \
+      TYPEDEF $initVal \
+      OBJ     $initVal \
+    ]
+    T_RangeErrorCmd $param Ignore ::Param                 $expectedVals $rngErrProcParam_
+    T_RangeErrorCmd $param Ignore ::Param::ColorComponent $expectedVals $rngErrProcTDef_
+    T_RangeErrorCmd $param Ignore $param                  $expectedVals $rngErrProcObj_
+  }
+
+
+  private proc testRangeErrorCmdForce {} {
+    variable rngErrProcParam_
+    variable rngErrProcTDef_
+    variable rngErrProcObj_
+
+    set typeName ColorComponent
+    set initVal red
+    T_Param_New param $typeName $initVal
+    T_toString $param $typeName $initVal
+
+    set expectedVals [dict create \
+      PARAM   PARAM   \
+      TYPEDEF TYPEDEF \
+      OBJ     OBJ     \
+    ]
+    T_RangeErrorCmd $param Force ::Param                 $expectedVals $rngErrProcParam_
+    T_RangeErrorCmd $param Force ::Param::ColorComponent $expectedVals $rngErrProcTDef_
+    T_RangeErrorCmd $param Force $param                  $expectedVals $rngErrProcObj_
+  }
+
+
+  private proc testRangeErrorCmdAgain {} {
+    variable rngErrProcParam_
+    variable rngErrProcTDef_
+    variable rngErrProcObj_
+
+    set typeName ColorComponent
+    set initVal red
+    T_Param_New param $typeName $initVal
+    T_toString $param $typeName $initVal
+
+    set newVal alpha
+    foreach newVal {red green blue alpha} {
+      set expectedVals [dict create \
+        PARAM   $newVal \
+        TYPEDEF $newVal \
+        OBJ     $newVal \
+      ]
+      T_RangeErrorCmd $param "Again $newVal" ::Param                 $expectedVals $rngErrProcParam_
+      T_RangeErrorCmd $param "Again $newVal" ::Param::ColorComponent $expectedVals $rngErrProcTDef_
+      T_RangeErrorCmd $param "Again $newVal" $param                  $expectedVals $rngErrProcObj_
+    }
   }
 
 
@@ -196,8 +271,8 @@ namespace eval ::Param::UnitTest {
   }
 
 
-  private proc doTestIntegerImpl { type } {
-    variable errNotInRange
+  private proc T_Integer { type } {
+    variable errNotInRange_
 
     H "testInteger $type"
     set initVal 33
@@ -211,13 +286,13 @@ namespace eval ::Param::UnitTest {
     T {$param /= 2} 44
     T {$param *= 2} 88
     T {$param = 6 * 11 - 3} 63
-    E {$param = XYZ} $errNotInRange
-    doTestIntegerMonthImpl $type
+    E {$param = XYZ} $errNotInRange_
+    T_IntegerMonth $type
   }
 
 
-  private proc doTestIntegerMonthImpl { type } {
-    variable errNotInRange
+  private proc T_IntegerMonth { type } {
+    variable errNotInRange_
 
     H "testInteger [set typeName iMonth_$type]"
     T {Param typedef $type $typeName {1 12}} $typeName
@@ -226,12 +301,12 @@ namespace eval ::Param::UnitTest {
     T_toString $param $typeName $initVal
     T {$param = 7} 7
     T {$param getValue} 7
-    E {$param = 13} $errNotInRange
+    E {$param = 13} $errNotInRange_
   }
 
 
-  private proc doTestDoubleImpl { type } {
-    variable errNotInRange
+  private proc T_Double { type } {
+    variable errNotInRange_
 
     H "testDouble $type"
     set initVal 33.33
@@ -244,13 +319,13 @@ namespace eval ::Param::UnitTest {
     T {$param *= 2} double(12.5)
     T {$param = 2 * 12.0} double(24)
     T {$param = 3 * 12} double(36)
-    E {$param = XYZ} $errNotInRange
-    doTestDoubleScaleImpl $type
+    E {$param = XYZ} $errNotInRange_
+    T_DoubleScale $type
   }
 
 
-  private proc doTestDoubleScaleImpl { type } {
-    variable errNotInRange
+  private proc T_DoubleScale { type } {
+    variable errNotInRange_
 
     H "testDouble [set typeName Scale_$type]"
     T {Param typedef $type $typeName {>0 10}} $typeName
@@ -259,10 +334,79 @@ namespace eval ::Param::UnitTest {
     T_toString $param $typeName $initVal
     T {$param setValue .4} double(0.4)
     T {$param = 10.0000} double(10)
-    E {$param = 0} $errNotInRange
-    E {$param = 10.1} $errNotInRange
-    E {$param = XYZ} $errNotInRange
+    E {$param = 0} $errNotInRange_
+    E {$param = 10.1} $errNotInRange_
+    E {$param = XYZ} $errNotInRange_
   }
+
+
+  private proc T_RangeErrorCmd { param rngErrCmdSfx blob expectedVals rngProc } {
+    variable errNotInRange_
+    variable rangeErrProc_
+
+    H "testRangeErrorCmd$rngErrCmdSfx $blob"
+    T {$blob setRangeErrorCmd "UnitTest::rangeErr$rngErrCmdSfx"} [$blob getRangeErrorCmd]
+    dict for {key val} $expectedVals {
+      T {$param = $key} $val
+      T {set rangeErrProc_} $rngProc
+    }
+    T {$blob setRangeErrorCmd {}} [$blob getRangeErrorCmd]
+    set rangeErrProc_ null
+    dict for {key val} $expectedVals {
+      E {$param = $key} $errNotInRange_
+      T {set rangeErrProc_} null
+    }
+  }
+
+  proc enumRangeErrObj { a0 obj valVar } {
+    variable rangeErrProc_ [dict get [info frame -2] proc]
+    upvar $valVar val
+    #puts "#### enumRangeErrObj '$a0' '$obj' '$val'"
+    if { "$val" == "OBJ" } {
+      return -code error "$a0-enumRangeErrObj"
+    }
+    return fatal
+  }
+
+  proc enumRangeErrTypedef { a0 obj valVar } {
+    variable rangeErrProc_ [dict get [info frame -2] proc]
+    upvar $valVar val
+    #puts "#### enumRangeErrTypedef '$a0' '$obj' '$val'"
+    if { "$val" == "TYPEDEF" } {
+      return -code error "$a0-enumRangeErrTypedef"
+    }
+    return fatal
+  }
+
+  proc enumRangeErrParam { a0 obj valVar } {
+    variable rangeErrProc_ [dict get [info frame -2] proc]
+    upvar $valVar val
+    #puts "#### enumRangeErrParam '$a0' '$obj' '$val'"
+    if { "$val" == "PARAM" } {
+      return -code error "$a0-enumRangeErrParam"
+    }
+    return fatal
+  }
+
+  proc rangeErrIgnore { obj valVar } {
+    variable rangeErrProc_ [dict get [info frame -2] proc]
+    upvar $valVar val
+    return ignore
+  }
+
+  proc rangeErrForce { obj valVar } {
+    variable rangeErrProc_ [dict get [info frame -2] proc]
+    upvar $valVar val
+    return force
+  }
+
+  proc rangeErrAgain { newVal obj valVar } {
+    variable rangeErrProc_ [dict get [info frame -2] proc]
+    upvar $valVar val
+    set val $newVal
+    return again
+  }
+
 
   namespace ensemble create
 }

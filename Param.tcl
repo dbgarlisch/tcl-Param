@@ -237,11 +237,11 @@ namespace eval ::Param {
     variable rangeErrorCmd_
     # Give Param first dibs
     set ret [invokeRangeErrorCmd $rangeErrorCmd_ $obj val]
-    if { !$ret } {
+    if { "fatal" == "$ret" } {
       # Not handled by Param. Give the $obj's typedef namespace a chance
       set ret [::Param::[$obj getType]::notifyRangeError $obj val]
     }
-    if { !$ret } {
+    if { "fatal" == "$ret" } {
       # Not handled by Param or typedef. Give $obj a chance
       set ret [${obj}::notifyRangeError val]
     }
@@ -251,7 +251,7 @@ namespace eval ::Param {
 
   private proc invokeRangeErrorCmd { cb obj valVar } {
     upvar $valVar val
-    set ret 0
+    set ret fatal
     if { "" != "$cb" } {
       #puts "### invokeRangeErrorCmd '$cb' '$obj' '$val'"
       set ret [{*}$cb $obj val]
@@ -302,17 +302,33 @@ namespace eval ::Param {
       }
       if { [[::Param getValidator $type_]::validate val [::Param getLimits $type_]] } {
         # val is good - use it
-        set val_ $val
-        return $val_
+        return [set val_ $val]
       }
       # give any range error handlers a chance
-      if { ![::Param::notifyRangeError $self_ val] } {
-        # range error handlers did NOT stop error - drop through
-      } elseif { [[::Param getValidator $type_]::validate val [::Param getLimits $type_]] } {
-        # A range error handler fixed val - use it
-        set val_ $val
+      switch [set nre [::Param::notifyRangeError $self_ val]] {
+      fatal {
+        # trigger an error
+      }
+      again {
+        # value modified - validate it again
+        if { [[::Param getValidator $type_]::validate val [::Param getLimits $type_]] } {
+          # A range error handler fixed val - use it
+          return [set val_ $val]
+        }
+        # validation failed again - trigger an error
+      }
+      ignore {
+        # Ignore error and leave val_ alone.
         return $val_
       }
+      force {
+        # Force assignment of val to val_. Note that val MAY have been modified
+        # by notifyRangeError and could still be an invalid value.
+        return [set val_ $val]
+      }
+      default {
+        return -code error "Invalid return from notifyRangeError '$nre'"
+      } }
       # invalid val
       return -code error "Value [list $val] not in range [list [::Param getRange $type_]]"
     }
