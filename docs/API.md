@@ -300,12 +300,12 @@ where,
 `val` - The value being assigned.
 
 ## Range Error Commands
-When an assignment violates a parameter's range, a series of commands are attempted in turn.
-* The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
-* The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
-* The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
+When a requested assignment (see [$obj =](#obj-) and [$obj setValue](#obj-setvalue)) would violate a parameter's range, the new value is not immediately assigned to the parameter. Instead, a series of range error commands are attempted in turn as follows:
+1. The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
+2. The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
+3. The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
 
-The command is invoked as `[{*}$cmd $obj valueVarName]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVarName` arguments are always last.
+Each command is invoked as `[{*}$cmd $obj valueVarName]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVarName` arguments are always last.
 
 where,
 
@@ -313,7 +313,17 @@ where,
 
 `valueVarName` - The name of variable containing the invalid value. Use `upvar` to gain read/write access to this var.
 
-A command should return 1 to stop the command sequence and have the value revalidated. It should return 0 to continue the command sequence. 
+A range error command can decide what to do with the invalid value. It may attempt to fix the value or pass it on to the next command. A range error command must return one of `fatal`, `ignore`, `force`, or `again`.
+
+### Range Error `fatal`
+Returning `fatal` allows the range error command sequence to continue. If all range error commands return `fatal`, a Tcl error is triggered. This is the default behavior if no range error commands are defined.
+
+### Range Error `ignore`
+Returning `ignore` stops the range error command sequence. The invalid value is ignored. The param object's value is *not* changed and retains it current value.
+
+### Range Error `force`
+
+### Range Error `again`
 
 ## Usage Examples
 
