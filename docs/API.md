@@ -34,6 +34,10 @@ Provides the *Param* command ensemble.
     * [setRangeErrorCmd](#obj-setrangeerrorcmd)
     * [setValue](#obj-setvalue)
 * [Range Error Commands](#range-error-commands)
+  * [Range Error `again`](#range-error-again)
+  * [Range Error `fatal`](#range-error-fatal)
+  * [Range Error `force`](#range-error-force)
+  * [Range Error `ignore`](#range-error-ignore)
 * [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
@@ -305,25 +309,26 @@ When a requested assignment (see [$obj =](#obj-) and [$obj setValue](#obj-setval
 2. The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
 3. The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
 
-Each command is invoked as `[{*}$cmd $obj valueVarName]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVarName` arguments are always last.
+Each command is invoked as `[{*}$cmd $obj valueVar]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVar` arguments are always last.
 
 where,
 
 `$obj` - The parameter object, returned from [Param new](#param-new), that was assigned the invalid value.
 
-`valueVarName` - The name of variable containing the invalid value. Use `upvar` to gain read/write access to this var.
+`valueVar` - The name of variable containing the invalid value. Use `upvar` to gain read/write access to this var.
 
 A range error command can decide what to do with the invalid value. It may attempt to fix the value or pass it on to the next command. A range error command must return one of `fatal`, `ignore`, `force`, or `again`.
+
+### Range Error `again`
+Returning `again` stops the range error command sequence. The validator is invoked again using the new value returned in `valueVar`. If the new value is valid, the parameter assignment is completed successfully. If the new value is still invalid, it is treated as `fatal` and a Tcl error is triggered.
 
 ### Range Error `fatal`
 Returning `fatal` allows the range error command sequence to continue. If all range error commands return `fatal`, a Tcl error is triggered. This is the default behavior if no range error commands are defined.
 
-### Range Error `ignore`
-Returning `ignore` stops the range error command sequence. The invalid value is ignored. The param object's value is *not* changed and retains it current value.
-
 ### Range Error `force`
 
-### Range Error `again`
+### Range Error `ignore`
+Returning `ignore` stops the range error command sequence. The invalid value is ignored. The param object's value is *not* changed and retains it current value.
 
 ## Usage Examples
 
