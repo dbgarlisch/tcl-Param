@@ -56,9 +56,10 @@ A validator implements the following variable and procs. In the following sectio
 is a place holder for the actual validator namespace name.
 ```tcl
 namespace eval VTOR {
-  variable rangeSignature_ {signature-pattern}                          ;# REQUIRED
   variable createTypedef_ 1                                             ;# OPTIONAL
+  variable defaultValue_ {}                                             ;# OPTIONAL
   variable objectProto_ {commands added to objects of basetype}         ;# OPTIONAL
+  variable rangeSignature_ {signature-pattern}                          ;# REQUIRED
   variable staticProto_ {static commands added to typedefs of basetype} ;# OPTIONAL
   proc parseRange { range }                                             ;# REQUIRED
   proc validate { value limits }                                        ;# REQUIRED
