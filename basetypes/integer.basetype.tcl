@@ -4,6 +4,7 @@ if { [namespace exists integer] } {
 
 namespace eval integer {
   variable rangeSignature_ {?Inf|minLimit ?Inf|maxLimit??}
+  variable defaultValue_ 0
 
   #namespace import ::Debug::vputs
 

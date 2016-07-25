@@ -69,6 +69,10 @@ namespace eval ::Param {
     variable typedefProto_
     namespace eval ::Param::$name $typedefProto_
     set ::Param::${name}::self_ $name
+    if { "" != "[info vars ${vtorNamespace}::defaultValue_]" } {
+      # validator wants to modify the typedef default value
+      set ::Param::${name}::defaultValue_ [set ${vtorNamespace}::defaultValue_]
+    }
     if { "" != "[info vars ${vtorNamespace}::staticProto_]" } {
       # validator wants to modify the typedef ensemble
       namespace eval ::Param::$name [set ${vtorNamespace}::staticProto_]
@@ -80,7 +84,7 @@ namespace eval ::Param {
   }
 
 
-  public proc new { type {val @@NULL@@} } {
+  public proc new { type args } {
     variable basetypes_
     variable typedefs_
     if { ![isTypedef $type] } {
@@ -106,7 +110,11 @@ namespace eval ::Param {
     }
 
     # assign ctor value
-    $ret = [expr {"$val" == "@@NULL@@" ? "DEF" : "$val"}]
+    if { 0 == [llength $args] } {
+      $ret = [::Param::$type getDefaultValue]
+    } else {
+      $ret = {*}$args
+    }
     return $ret
   }
 
@@ -264,6 +272,7 @@ namespace eval ::Param {
   variable typedefProto_ {
     variable self_ {}
     variable rangeErrorCmd_ {}
+    variable defaultValue_ {}
 
     public proc setRangeErrorCmd { cmd } {
       variable rangeErrorCmd_
@@ -275,6 +284,18 @@ namespace eval ::Param {
     public proc getRangeErrorCmd { } {
       variable rangeErrorCmd_
       return $rangeErrorCmd_
+    }
+
+    public proc setDefaultValue { val } {
+      variable defaultValue_
+      set ret $defaultValue_
+      set defaultValue_ $val
+      return $ret
+    }
+
+    public proc getDefaultValue { } {
+      variable defaultValue_
+      return $defaultValue_
     }
 
     private proc notifyRangeError { obj valVar } {
@@ -379,6 +400,11 @@ namespace eval ::Param {
     public proc getRangeErrorCmd { } {
       variable rangeErrorCmd_
       return $rangeErrorCmd_
+    }
+
+    public proc delete {} {
+      variable self_
+      namespace delete $self_
     }
 
     private proc notifyRangeError { valVar } {

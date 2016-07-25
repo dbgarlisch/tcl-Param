@@ -60,16 +60,24 @@ namespace eval ::Param::UnitTest {
     variable errNotInRange_
 
     H testString
+    T_Param_New defParam string
+    T {$defParam getValue} {}
+    T {$defParam delete} {}
     set initVal {hello world!}
     T_Param_New param string $initVal
     T_toString $param string $initVal
     T {$param = hello} hello
     T {$param += { world!}} $initVal
-    unset param
+    T {$param delete} {}
 
     set typeName BigStrRegEx
     H "testString $typeName"
     T {Param typedef string $typeName {r/^big\S{1,4}$/it 4 7}} $typeName
+    E_Param_New defParam $typeName $errNotInRange_
+    T {Param::$typeName setDefaultValue BIGX} {}
+    T_Param_New defParam $typeName
+    T {$defParam getValue} BIGX
+    T {$defParam delete} {}
     set initVal "BigStr"
     T_Param_New param $typeName $initVal
     T_toString $param $typeName $initVal
@@ -77,11 +85,12 @@ namespace eval ::Param::UnitTest {
     T {$param setValue "big12"} "big12"
     T {$param += "AB"} "big12AB"
     E {$param += " X"} $errNotInRange_
-    unset param
+    T {$param delete} {}
 
     set typeName BigStrGlob
     H "testString $typeName"
     T {Param typedef string $typeName {g/big*/it 4 7}} $typeName
+    E_Param_New defParam $typeName $errNotInRange_
     set initVal "BigStrG"
     T_Param_New param $typeName $initVal
     T_toString $param $typeName $initVal
@@ -89,7 +98,7 @@ namespace eval ::Param::UnitTest {
     T {$param setValue "big12"} "big12"
     T {$param += " B"} "big12 B"
     E {$param += " B"} $errNotInRange_
-    unset param
+    T {$param delete} {}
   }
 
 
@@ -99,6 +108,7 @@ namespace eval ::Param::UnitTest {
     set typeName ColorComponent
     H "testEnum $typeName obj"
     T {Param typedef enum $typeName {red|green|blue=5|alpha}} $typeName
+    E_Param_New defParam $typeName $errNotInRange_
     set initVal red
     T_Param_New param $typeName $initVal
     T_toString $param $typeName $initVal
@@ -124,12 +134,14 @@ namespace eval ::Param::UnitTest {
     T {$param getId} 6
     E {$param = yellow} $errNotInRange_
     E {$param = 3} $errNotInRange_
+    T {$param delete} {}
 
     H "testEnum $typeName getTokenId"
     T {::Param::ColorComponent getTokenId red} 0
     T {::Param::ColorComponent getTokenId green} 1
     T {::Param::ColorComponent getTokenId blue} 5
     T {::Param::ColorComponent getTokenId alpha} 6
+    E {::Param::ColorComponent getTokenId abc} {Invalid ColorComponent token 'abc'. Should be one of 'red green blue alpha'}
   }
 
 
@@ -185,6 +197,8 @@ namespace eval ::Param::UnitTest {
     T {set rangeErrProc_} null
     E {$param = OBJ} $errNotInRange_
     T {set rangeErrProc_} null
+
+    T {$param delete} {}
   }
 
 
@@ -206,6 +220,8 @@ namespace eval ::Param::UnitTest {
     T_RangeErrorCmd $param Ignore ::Param                 $expectedVals $rngErrProcParam_
     T_RangeErrorCmd $param Ignore ::Param::ColorComponent $expectedVals $rngErrProcTDef_
     T_RangeErrorCmd $param Ignore $param                  $expectedVals $rngErrProcObj_
+
+    T {$param delete} {}
   }
 
 
@@ -227,6 +243,8 @@ namespace eval ::Param::UnitTest {
     T_RangeErrorCmd $param Force ::Param                 $expectedVals $rngErrProcParam_
     T_RangeErrorCmd $param Force ::Param::ColorComponent $expectedVals $rngErrProcTDef_
     T_RangeErrorCmd $param Force $param                  $expectedVals $rngErrProcObj_
+
+    T {$param delete} {}
   }
 
 
@@ -250,6 +268,8 @@ namespace eval ::Param::UnitTest {
       T_RangeErrorCmd $param "Again $newVal" ::Param::ColorComponent $expectedVals $rngErrProcTDef_
       T_RangeErrorCmd $param "Again $newVal" $param                  $expectedVals $rngErrProcObj_
     }
+
+    T {$param delete} {}
   }
 
 
@@ -257,10 +277,17 @@ namespace eval ::Param::UnitTest {
   #                              Test Helpers
   #========================================================================
 
-  private proc T_Param_New { objVar type initVal } {
+  private proc T_Param_New { objVar type args } {
     upvar $objVar obj
     variable rePatternParamObj_
-    T {set obj [Param new $type $initVal]} "r/$rePatternParamObj_/"
+    T {set obj [Param new $type {*}$args]} "r/$rePatternParamObj_/"
+  }
+
+
+  private proc E_Param_New { objVar type errPattern args } {
+    upvar $objVar obj
+    variable rePatternParamObj_
+    E {set obj [Param new $type {*}$args]} $errPattern
   }
 
 
@@ -274,6 +301,9 @@ namespace eval ::Param::UnitTest {
     variable errNotInRange_
 
     H "testInteger $type"
+    T_Param_New defParam $type
+    T {$defParam getValue} 0
+    T {$defParam delete} {}
     set initVal 33
     T_Param_New param $type $initVal
     T_toString $param $type $initVal
@@ -286,6 +316,7 @@ namespace eval ::Param::UnitTest {
     T {$param *= 2} 88
     T {$param = 6 * 11 - 3} 63
     E {$param = XYZ} $errNotInRange_
+    T {$param delete} {}
     T_IntegerMonth $type
   }
 
@@ -301,6 +332,7 @@ namespace eval ::Param::UnitTest {
     T {$param = 7} 7
     T {$param getValue} 7
     E {$param = 13} $errNotInRange_
+    T {$param delete} {}
   }
 
 
@@ -308,6 +340,9 @@ namespace eval ::Param::UnitTest {
     variable errNotInRange_
 
     H "testDouble $type"
+    T_Param_New defParam $type
+    T {$defParam getValue} double(0.0)
+    T {$defParam delete} {}
     set initVal 33.33
     T_Param_New param $type $initVal
     T_toString $param $type $initVal
@@ -319,6 +354,7 @@ namespace eval ::Param::UnitTest {
     T {$param = 2 * 12.0} double(24)
     T {$param = 3 * 12} double(36)
     E {$param = XYZ} $errNotInRange_
+    T {$param delete} {}
     T_DoubleScale $type
   }
 
@@ -336,6 +372,7 @@ namespace eval ::Param::UnitTest {
     E {$param = 0} $errNotInRange_
     E {$param = 10.1} $errNotInRange_
     E {$param = XYZ} $errNotInRange_
+    T {$param delete} {}
   }
 
 
@@ -410,3 +447,5 @@ namespace eval ::Param::UnitTest {
   namespace ensemble create
 }
 ::Param::UnitTest run
+
+puts [namespace children ::Param]

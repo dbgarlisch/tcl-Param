@@ -4,6 +4,7 @@ if { [namespace exists double] } {
 
 namespace eval double {
   variable rangeSignature_ {?Inf|?>|=?minLimit ?Inf|?<|=?maxLimit??}
+  variable defaultValue_ 0.0
 
   #namespace import ::Debug::vputs
 
