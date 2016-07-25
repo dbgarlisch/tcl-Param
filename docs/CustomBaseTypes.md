@@ -14,6 +14,11 @@ See also [tcl-Param API Docs](API.md) and [BuiltIn Base Types](BuiltInBaseTypes.
 * [Base Type Definition File](#base-type-definition-file)
 * [Validators](#validators)
   * [Validator Variables](#validator-variables)
+    * [createTypedef_](#createTypedef)
+    * [defaultValue_](#defaultValue_)
+    * [objectProto_](#objectProto_)
+    * [rangeSignature_](#rangeSignature_)
+    * [staticProto_](#staticProto_)
   * [Validator Commands](#validator-commands)
     * [parseRange](#parserange)
     * [validate](#validate)
@@ -63,18 +68,25 @@ namespace eval VTOR {
 
 ### Validator Variables
 
-`VTOR::rangeSignature_` - Provides the base type's human readable range signature
-pattern string. This should describe the range value expected by the validator's
-parseRange proc. This string is primarily used for error reporting. REQUIRED.
-
+#### createTypedef_
 `VTOR::createTypedef_` - If 1, a typedef is created with the same name as the base
 type. If 0, a typedef is not created. OPTIONAL (default 1).
 
+#### defaultValue_
+`VTOR::defaultValue_` - Provides the base type's default value. See [Typedef setDefaultValue](API.md#typedef-setdefaultvalue). OPTIONAL (default {}).
+
+#### objectProto_
 `VTOR::objectProto_` - Defines one or more base type specific variables or procs
 that are added to all Param instances of this base type. See [Param new](API.md#param-new).
 These variables and procs extend a Param instance beyond its base procs and
 variables. See [builtin base type object commands](BuiltInBaseTypes.md). OPTIONAL (default {}).
 
+#### rangeSignature_
+`VTOR::rangeSignature_` - Provides the base type's human readable range signature
+pattern string. This should describe the range value expected by the validator's
+parseRange proc. This string is primarily used for error reporting. REQUIRED.
+
+#### staticProto_
 `VTOR::staticProto_` - Defines one or more typedef specific variables or procs
 that are added to all typedefs of this base type. See [Param typedef](API.md#param-typedef).
 These variables and procs extend a typedef beyond its base procs and
