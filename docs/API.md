@@ -44,6 +44,7 @@ Provides the *Param* command ensemble.
 * [Usage Examples](#usage-examples)
   * [Base Type Params](#base-type-params)
   * [Typedef Params](#typedef-params)
+  * [Range Error Handling](#range-error-handling)
 
 
 ## Param Commands
@@ -447,4 +448,115 @@ ColorComponent getTokenId(alpha=6)
 | int             | ?Inf|minLimit ?Inf|maxLimit??                                |
 | string          | ?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???             |
 | text            | ?g|r<CHAR>pattern<CHAR>?i??t? ?minLen ?maxLen???             |
+```
+
+
+### Range Error Handling
+```
+# the range error handler
+proc myErrHandler { needle newVal obj valVar } {
+  # alias valVar into this scope
+  upvar $valVar val
+
+  # Who is calling myErrHandler?
+  puts [namespace qualifiers [dict get [info frame -2] proc]]
+
+  # error handler called with:
+  puts "  myErrHandler needle($needle) newVal($newVal) obj($obj) val($val)"
+
+  # If the invalid value $val is equal to $needle, set val to $newVal and return
+  # again (this will tell validator to try again). Otherwise, return fatal.
+  set ret fatal
+  if { "$val" == "$needle" } {
+    set val $newVal
+    set ret again
+    puts "  val set to [list $val]"
+  }
+  puts "  returned $ret\n"
+  return $ret
+}
+
+# create enum typedef named ColorComponent
+Param typedef enum ColorComponent {red|green|blue=5|alpha}
+
+# create ColorComponent param object
+set param [Param new ColorComponent "red"]
+
+# set global range error command
+Param setRangeErrorCmd "myErrHandler PARAM red"
+
+# set ColorComponent range error command
+Param::ColorComponent setRangeErrorCmd "myErrHandler TYPEDEF green"
+
+# set param's range error command
+$param setRangeErrorCmd "myErrHandler OBJ blue"
+
+foreach badVal {OBJ TYPEDEF PARAM ABC} {
+  puts "\n----------------------------------------"
+  puts "calling {\$param = $badVal}\n"
+  catch {$param = $badVal} ret
+  puts "param == $ret"
+}
+```
+
+Output:
+```
+----------------------------------------
+calling {$param = OBJ}
+
+::Param
+  myErrHandler needle(PARAM) newVal(red) obj(::Param::param_1) val(OBJ)
+  returned fatal
+
+::Param::ColorComponent
+  myErrHandler needle(TYPEDEF) newVal(green) obj(::Param::param_1) val(OBJ)
+  returned fatal
+
+::Param::param_1
+  myErrHandler needle(OBJ) newVal(blue) obj(::Param::param_1) val(OBJ)
+  val set to blue
+  returned again
+
+param == blue
+
+----------------------------------------
+calling {$param = TYPEDEF}
+
+::Param
+  myErrHandler needle(PARAM) newVal(red) obj(::Param::param_1) val(TYPEDEF)
+  returned fatal
+
+::Param::ColorComponent
+  myErrHandler needle(TYPEDEF) newVal(green) obj(::Param::param_1) val(TYPEDEF)
+  val set to green
+  returned again
+
+param == green
+
+----------------------------------------
+calling {$param = PARAM}
+
+::Param
+  myErrHandler needle(PARAM) newVal(red) obj(::Param::param_1) val(PARAM)
+  val set to red
+  returned again
+
+param == red
+
+----------------------------------------
+calling {$param = ABC}
+
+::Param
+  myErrHandler needle(PARAM) newVal(red) obj(::Param::param_1) val(ABC)
+  returned fatal
+
+::Param::ColorComponent
+  myErrHandler needle(TYPEDEF) newVal(green) obj(::Param::param_1) val(ABC)
+  returned fatal
+
+::Param::param_1
+  myErrHandler needle(OBJ) newVal(blue) obj(::Param::param_1) val(ABC)
+  returned fatal
+
+param == Value ABC not in range red|green|blue=5|alpha
 ```
