@@ -42,6 +42,8 @@ supports the *=* (value <= `maxLimit`) and *<* (value < `maxLimit`) prefixes. If
 prefix is given, *=* is used. Use *Inf* for an unlimited value. If the range is
 empty, `{Inf Inf}` is used.
 
+The default value is 0.0.
+
 | Range     | Comparison           |
 | --------- | -------------------- |
 | {0 10}    | 0.0 <= value <= 10.0 |
@@ -100,6 +102,8 @@ where,
 ```
 An `integer` value supports a `minLimit`, `maxLimit` range. Use *Inf* for an
 unlimited value. If the range is empty, `{Inf Inf}` is used.
+
+The default value is 0.
 
 | Range     | Comparison           |
 | --------- | -------------------- |
@@ -171,6 +175,7 @@ trimmed before the comparison is performed.
 If `minLen` is specified, the value length must be >= `minLen`.
 If `maxLen` is specified, the value length must be <= `maxLen`.
 
+The default value is {}.
 
 | Range              | Comparison                          |
 | ------------------ | ----------------------------------- |
