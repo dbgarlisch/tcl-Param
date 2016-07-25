@@ -19,7 +19,9 @@ Provides the *Param* command ensemble.
   * [typedef](#param-typedef)
   * [setRangeErrorCmd](#param-setrangeerrorcmd)
 * [Typedef Commands](#typedef-commands)
+  * [getDefaultValue](#typedef-getdefaultvalue)
   * [getRangeErrorCmd](#typedef-getrangeerrorcmd)
+  * [setDefaultValue](#typedef-setdefaultvalue)
   * [setRangeErrorCmd](#typedef-setrangeerrorcmd)
 * [Parameter Objects](#parameter-objects)
   * [Parameter Object Variables](#parameter-object-variables)
@@ -214,9 +216,15 @@ where,
 
 
 ## Typedef Commands
-Each typedef supports the following static commands. These commands are accessed using the `Param::TypedefName` ensemble.
+Each typedef supports the following commands. These commands are accessed using the `Param::TypedefName` ensemble.
 Additional commands may be added by a base type validator.
 See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VTOR::objectProto_](CustomBaseTypes.md#validator-variables).
+
+### Typedef getDefaultValue
+```tcl
+Param::TypedefName getDefaultValue
+```
+Gets the typedef's current default value. This value is assigned to a parameter if a value is not specified when it is created. See [Param new](#param-new).
 
 ### Typedef getRangeErrorCmd
 ```tcl
@@ -224,6 +232,16 @@ Param::TypedefName getRangeErrorCmd
 ```
 Gets the typedef's current range error command.
 See also [Range Error Commands](#range-error-commands).
+
+### Typedef setDefaultValue
+```tcl
+Param::TypedefName setDefaultValue val
+```
+Sets the typedef's default value. This value is assigned to a parameter if a value is not specified when it is created. See [Param new](#param-new). Returns the previous default value.
+
+where,
+
+`val` - The default value. This value is *not* validated until it is assigned to a newly created parameter.
 
 ### Typedef setRangeErrorCmd
 ```tcl
@@ -246,11 +264,11 @@ See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VTOR::objectProto_](Cust
 These variables are managed by the parameter object. A typical application should not access these values directly. However, these values will often be directly accessed by [validators](CustomBaseTypes.md#validators).
 
 ### $obj::self_
-The object's namespace name. The same value returned by [Param new](API.md#param-new).
+The object's namespace name. The same value returned by [Param new](#param-new).
 That is, ($obj == $obj::self_) is true.
 
 ### $obj::type_
-The object's type name as passed to [Param new](API.md#param-new).
+The object's type name as passed to [Param new](#param-new).
 
 ### $obj::val_
 The object's current value as set by [$obj =](#obj-) or [$obj setValue](#obj-setvalue).
