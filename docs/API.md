@@ -18,6 +18,9 @@ Provides the *Param* command ensemble.
   * [new](#param-new)
   * [typedef](#param-typedef)
   * [setRangeErrorCmd](#param-setrangeerrorcmd)
+* [Typedef Commands](#typedef-commands)
+  * [getRangeErrorCmd](#typedef-getrangeerrorcmd)
+  * [setRangeErrorCmd](#typedef-setrangeerrorcmd)
 * [Parameter Objects](#parameter-objects)
   * [Parameter Object Variables](#parameter-object-variables)
     * [$self_](#objself_)
@@ -114,7 +117,8 @@ where,
 ```tcl
 Param getRangeErrorCmd
 ```
-Gets the current range error command.
+Gets the current, global range error command.
+See also [Range Error Commands](#range-error-commands).
 
 ### Param getRangeSignature
 ```tcl
@@ -178,7 +182,7 @@ where,
 ```tcl
 Param setRangeErrorCmd cmd
 ```
-Sets the command to be invoked when an assignment violates a parameter's range.
+Sets the command to be invoked when an assignment violates a parameter's range. This command applies to *all* parameters.
 See also [Range Error Commands](#range-error-commands). Returns the previous command.
 
 where,
@@ -206,6 +210,30 @@ where,
           [BuiltIn Base Types](BuiltInBaseTypes.md). (default {})
 
 `replace` - If 1, any existing type definition will be replaced with this one. (default 0)
+
+
+## Typedef Commands
+Each typedef supports the following static commands. These commands are accessed using the `Param::TypedefName` ensemble.
+Additional commands may be added by a base type validator.
+See also [BuiltIn Base Types](BuiltInBaseTypes.md) and [VTOR::objectProto_](CustomBaseTypes.md#validator-variables).
+
+### Typedef getRangeErrorCmd
+```tcl
+Param::TypedefName getRangeErrorCmd
+```
+Gets the typedef's current range error command.
+See also [Range Error Commands](#range-error-commands).
+
+### Typedef setRangeErrorCmd
+```tcl
+Param::TypedefName setRangeErrorCmd cmd
+```
+Sets the command to be invoked when an assignment violates a parameter's range. This command applies to all parameters created with `TypedefName`.
+See also [Range Error Commands](#range-error-commands). Returns the previous command.
+
+where,
+
+`cmd` - The command to invoke.
 
 
 ## Parameter Objects
@@ -267,7 +295,8 @@ Returns the unparsed `range` value passed to [Param typedef](#param-typedef).
 ```tcl
 $obj getRangeErrorCmd
 ```
-Gets the current range error command.
+Gets the object's current range error command.
+See also [Range Error Commands](#range-error-commands).
 
 ### $obj getType
 ```tcl
@@ -285,7 +314,7 @@ Returns the current parameter value.
 ```tcl
 $obj setRangeErrorCmd cmd
 ```
-Sets the command to be invoked when an assignment violates this parameter's range.
+Sets the command to be invoked when an assignment violates a parameter's range. This command only applies to to this specific parameter object.
 See also [Range Error Commands](#range-error-commands). Returns the previous command.
 
 where,
@@ -305,9 +334,9 @@ where,
 
 ## Range Error Commands
 When a requested assignment (see [$obj =](#obj-) and [$obj setValue](#obj-setvalue)) would violate a parameter's range, the new value is not immediately assigned to the parameter. Instead, a series of range error commands are attempted in turn as follows:
-* The `Param` command set by [::Param setRangeErrorCmd](#param-setrangeerrorcmd)
-* The `typedef` command set by [::Param::TYPEDEF setRangeErrorCmd](#typedef-setrangeerrorcmd)
-* The `Param` object command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
+* The global `Param` command set by [Param setRangeErrorCmd](#param-setrangeerrorcmd)
+* The `typedef` specific command set by [Param::TypedefName setRangeErrorCmd](#typedef-setrangeerrorcmd)
+* The object specific command set by [$obj setRangeErrorCmd](#obj-setrangeerrorcmd)
 
 Each command is invoked as `[{*}$cmd $obj valueVar]`. The `cmd` is usually a proc name followed by zero or more fixed arguments. The `$obj` and `valueVar` arguments are always last.
 
