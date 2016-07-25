@@ -326,9 +326,10 @@ Returning `again` stops the range error command sequence. The validator is invok
 Returning `fatal` allows the range error command sequence to continue. If all range error commands return `fatal`, a Tcl error is triggered. This is the default behavior if no range error commands are defined.
 
 ### Range Error `force`
+Returning `force` stops the range error command sequence. The param object's value *is* changed to the invalid value. It is the application's responsibility to properly deal with the invalid values.
 
 ### Range Error `ignore`
-Returning `ignore` stops the range error command sequence. The invalid value is ignored. The param object's value is *not* changed and retains it current value.
+Returning `ignore` stops the range error command sequence. The param object's value is *not* changed and retains the value it had prior to the invalid assignment.
 
 ## Usage Examples
 
