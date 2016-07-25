@@ -265,11 +265,11 @@ namespace eval ::Param {
     variable self_ {}
     variable rangeErrorCmd_ {}
 
-    public proc setRangeErrorCmd { cb } {
+    public proc setRangeErrorCmd { cmd } {
       variable rangeErrorCmd_
-      set oldCB $rangeErrorCmd_
-      set rangeErrorCmd_ $cb
-      return $oldCB
+      set oldCmd $rangeErrorCmd_
+      set rangeErrorCmd_ $cmd
+      return $oldCmd
     }
 
     public proc getRangeErrorCmd { } {

@@ -240,7 +240,6 @@ namespace eval ::Param::UnitTest {
     T_Param_New param $typeName $initVal
     T_toString $param $typeName $initVal
 
-    set newVal alpha
     foreach newVal {red green blue alpha} {
       set expectedVals [dict create \
         PARAM   $newVal \
