@@ -447,5 +447,4 @@ namespace eval ::Param::UnitTest {
   namespace ensemble create
 }
 ::Param::UnitTest run
-
-puts [namespace children ::Param]
+#puts [namespace children ::Param]
