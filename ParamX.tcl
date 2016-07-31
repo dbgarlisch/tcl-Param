@@ -30,6 +30,11 @@ source [file join [file dirname [info script]] .. tcl-Utils ProcAccess.tcl]
 # The current ParamX impl does NOT support validators yet. Just testing out some
 # tracing logic.
 #
+# The trace callbacks do not get invoked until AFTER the var's value has been
+# updated. So, to restore the previous value if validation fails, we must cache
+# var values. Information about a traced var including its cached value are
+# stored in the ::ParamX::$keyName namespace variables val_, name_, and type_.
+#
 namespace eval ParamX {
 
   namespace import ::Debug::vputs ::Debug::verboseDo
@@ -116,6 +121,7 @@ namespace eval ParamX {
 
   private proc traceWriteNs { fullName keyName typedef locName key op args } {
     set val [set $fullName]
+    # This is where the validator would get invoked. Dummy one here for testing.
     if { "$val" == "BAD" } {
       return -code error "Invalid value '$val' assigned to '$locName'"
     }
@@ -142,6 +148,7 @@ namespace eval ParamX {
 
   private proc traceWriteLvl { lvl fullName keyName typedef locName key op args } {
     set val [uplevel #$lvl set $fullName]
+    # This is where the validator would get invoked. Dummy one here for testing.
     if { "$val" == "BAD" } {
       return -code error "Invalid value '$val' assigned to '$locName'"
     }
