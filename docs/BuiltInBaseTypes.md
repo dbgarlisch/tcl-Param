@@ -232,11 +232,11 @@ Returns the enum's current id value.
 
 ### Enum Typedef Commands
 
-#### $obj getTokenId token
+#### getTokenId token
 ```Tcl
-$obj getId
+TYPEDEF::getTokenId token
 ```
-Returns the token's associated id value.
+Returns the typedef token's associated id value.
 
 where,
 
