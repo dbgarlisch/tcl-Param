@@ -207,10 +207,10 @@ assigned the previous token's id value plus one. If there is no previous
 token, the id is set to zero.
 
 The default delimiter is the vbar '|' character. The delimiter can be changed
-by prefixing the list with a 2-character `|<CHAR>` sequence where `CHAR` is
+by prefixing the list with a 2-character `|<CHAR>` sequence where `<CHAR>` is
 the new delimiter.
 
-Because all enum typedefs must have a non-empty range, an `enum` typedef is
+Because all enum typedefs must have an explicit range, an `enum` typedef is
 **not** created.
 
 All `enum` parameters support the `$param getId` command. This returns the
@@ -232,7 +232,7 @@ Returns the enum's current id value.
 
 ### Enum Typedef Commands
 
-#### getTokenId token
+#### TYPEDEF::getTokenId
 ```Tcl
 TYPEDEF::getTokenId token
 ```
@@ -240,4 +240,4 @@ Returns the typedef token's associated id value.
 
 where,
 
-`token` - The enum token string.
+`token` - One of the enum tokens from the typedef's range.
