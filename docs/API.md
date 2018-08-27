@@ -426,7 +426,7 @@ $bigStr = "big" ;# ERROR
 $bigStr setValue "Big12345" ;# ERROR
 
 Param typedef string BigStrG {g/big*/it 4 7}
-set bigStrg [Param new BigStrR "BigStr"]
+set bigStrg [Param new BigStrG "BigStr"]
 $bigStrg = "Big1234"
 $bigStrg = "big" ;# ERROR
 $bigStrg setValue "Big12345" ;# ERROR
